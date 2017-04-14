@@ -1,3 +1,11 @@
+# Sailfish Ease virtual Keyboard
+
+[Preview](http://i.imgur.com/mekiJ4X.png "Sailfish Ease keyboard Preview")
+[Preview](http://i.imgur.com/LheLfqC.png "Sailfish Ease keyboard Preview")
+
+
+# Installation
+
 You should probably make a backup of your keyboard before installing, just in case :
 
 ```
