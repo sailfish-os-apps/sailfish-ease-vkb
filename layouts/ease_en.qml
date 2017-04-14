@@ -32,15 +32,25 @@ import ".."
 import Sailfish.Silica 1.0
 
 KeyboardEaseLayout {
+    accentMap: {
+        "´": {"e": "é", "E": "É", "a": "á", "A": "Á", "o": "ó", "O": "Ó", "i": "í", "I": "Í", "u": "ú", "U": "Ú", "y": "ý", "Y": "Ý"                   },
+        "^": {"e": "ê", "E": "Ê", "a": "â", "A": "Â", "o": "ô", "O": "Ô", "i": "î", "I": "Î", "u": "û", "U": "Û"                                       },
+        "¨": {"e": "ë", "E": "Ë", "a": "ä", "A": "Ä", "o": "ö", "O": "Ö", "i": "ï", "I": "Ï", "u": "ü", "U": "Ü", "y": "ÿ", "Y": "Ϋ"                   },
+        "`": {"e": "è", "E": "È", "a": "à", "A": "À", "o": "ò", "O": "Ò", "i": "ì", "I": "Ì", "u": "ù", "U": "Ù"                                       },
+        "°": {                    "a": "å", "A": "Å"                                                                                                   },
+        "~": {                    "a": "ã", "A": "Ã", "o": "õ", "O": "Õ"                                                           , "n": "ñ", "N": "Ñ"},
+        "¸": {"c": "ç", "C": "Ç"}
+    }
+
     KeyboardRow { 
         CharacterEaseKey {
             caption:        "a"; swipeCaption:        ["", "", "", "", "", "", "", "v"]; swipeSpecial: ["", "", "", "", "-", "", "", ""];
             captionShifted: "A"; swipeCaptionShifted: ["", "", "", "", "", "", "", "V"]; symView: "1"; symView2: caption }
         CharacterEaseKey {
-            caption:        "n"; swipeCaption:        ["", "", "", "", "", "", "l", ""]; swipeSpecial: ["`", "^", "", "+", "!", "/", "", "\\"];
+            caption:        "n"; swipeCaption:        ["", "", "", "", "", "", "l", ""]; swipeSpecial: ["`", "^", "´", "+", "!", "/", "", "\\"];
             captionShifted: "N"; swipeCaptionShifted: ["", "", "", "", "", "", "L", ""]; symView: "2"; symView2: caption }
         CharacterEaseKey {
-            caption:        "i"; swipeCaption:        ["", "", "", "", "", "x", "", ""]; swipeSpecial: ["", "", "", "?", "", "", "=", "£"];
+            caption:        "i"; swipeCaption:        ["", "", "", "", "", "x", "", ""]; swipeSpecial: ["¨", "°", "¸", "?", "", "", "=", "£"];
             captionShifted: "I"; swipeCaptionShifted: ["", "", "", "", "", "X", "", ""]; symView: "3"; symView2: caption }
 
         BackspaceKey {implicitWidth: symbol.width}

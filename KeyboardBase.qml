@@ -50,8 +50,10 @@ Item {
                                       || shiftState === ShiftState.LatchedShift
                                       || shiftState === ShiftState.LockedShift
                                       || (shiftState === ShiftState.AutoShift && autocaps
-                                          && (typeof inputHandler.preedit !== "string"
-                                              || inputHandler.preedit.length === 0))
+                                          && (typeof layout.isEase !== 'undefined' ? (typeof inputEaseHandler.preedit !== "string"
+                                                                                      || inputEaseHandler.preedit.length === 0)
+                                                                                   :(typeof inputHandler.preedit !== "string"
+                                                                                     || inputHandler.preedit.length === 0)))
     readonly property bool isShiftLocked: shiftState === ShiftState.LockedShift
 
     property bool inSymView
@@ -77,6 +79,9 @@ Item {
 
     // Can be changed to PreeditTestHandler to have another mode of input
     property Item inputHandler: InputHandler {
+    }
+
+    property Item inputEaseHandler: InputEaseHandler {
     }
 
     height: layout ? layout.height : 0
@@ -143,7 +148,11 @@ Item {
             }
         }
         onInputMethodReset: {
-            inputHandler._reset()
+            if (typeof layout.isEase !== 'undefined') {
+                inputEaseHandler._reset()
+            } else {
+                inputHandler._reset()
+            }
         }
     }
 
@@ -219,7 +228,11 @@ Item {
                 // swiped down to close keyboard
                 MInputMethodQuick.userHide()
                 if (point.pressedKey) {
-                    inputHandler._handleKeyRelease()
+                    if (typeof layout.isEase !== 'undefined') {
+                        inputEaseHandler._handleKeyRelease()
+                    } else {
+                        inputHandler._handleKeyRelease()
+                    }
                     point.pressedKey.pressed = false
                 }
                 lastPressedKey = null
@@ -294,7 +307,11 @@ Item {
         }
 
         if (point.pressedKey !== null) {
-            inputHandler._handleKeyRelease()
+            if (typeof layout.isEase !== 'undefined') {
+                inputEaseHandler._handleKeyRelease()
+            } else {
+                inputHandler._handleKeyRelease()
+            }
             point.pressedKey.pressed = false
         }
 
@@ -312,7 +329,11 @@ Item {
             // on that case, trigger input from previous character
             releasePreviousCharacterKey(point)
             point.pressedKey.pressed = true
-            inputHandler._handleKeyPress(point.pressedKey)
+            if (typeof layout.isEase !== 'undefined') {
+                inputEaseHandler._handleKeyPress(point.pressedKey)
+            } else {
+                inputHandler._handleKeyPress(point.pressedKey)
+            }
             if (point.pressedKey.key === Qt.Key_Space && layoutChangeAllowed)
                 languageSwitchTimer.start()
         }
@@ -405,7 +426,11 @@ Item {
             return
 
         if (point.pressedKey) {
-            inputHandler._handleKeyRelease()
+            if (typeof layout.isEase !== 'undefined') {
+                inputEaseHandler._handleKeyRelease()
+            } else {
+                inputHandler._handleKeyRelease()
+            }
             point.pressedKey.pressed = false
             if (lastPressedKey === point.pressedKey) {
                 lastPressedKey = null
@@ -434,7 +459,11 @@ Item {
         inSymView2 = false
 
         resetShift()
-        inputHandler._reset()
+        if (typeof layout.isEase !== 'undefined') {
+            inputEaseHandler._reset()
+        } else {
+            inputHandler._reset()
+        }
 
         lastPressedKey = null
         lastInitialKey = null
@@ -527,10 +556,18 @@ Item {
 
     function triggerKey(key) {
         if (key.keyType !== KeyType.DeadKey) {
-            inputHandler._handleKeyClick(key)
+            if (typeof layout.isEase !== 'undefined') {
+                inputEaseHandler._handleKeyClick(key)
+            } else {
+                inputHandler._handleKeyClick(key)
+            }
         }
         key.clicked()
-        inputHandler._handleKeyRelease()
+        if (typeof layout.isEase !== 'undefined') {
+            inputEaseHandler._handleKeyRelease()
+        } else {
+            inputHandler._handleKeyRelease()
+        }
         quickPick.handleInput(key)
         key.pressed = false
     }

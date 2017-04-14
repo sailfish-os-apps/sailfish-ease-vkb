@@ -25,6 +25,8 @@ Column {
     property bool capsLockSupported: true
 
     property bool isEase: true
+    property var accentMap: ({})
+    property string lastAccentMerge: ""
 
     Component.onCompleted: updateSizes()
     onWidthChanged: updateSizes()
