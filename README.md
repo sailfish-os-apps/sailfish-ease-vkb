@@ -46,6 +46,7 @@ At any time (whether they are visible or not) you can input a special character 
 to input ".", press "e" then swipe down
 ```
 Numbers are available by pressing the "?123" key on the right
+
 You can input accentuated characters by entering the diacritics you want to use after the character
 ```
 to input "é", input "e" then input "´" ("n" then swipe up-right)
