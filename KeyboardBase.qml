@@ -530,7 +530,7 @@ Item {
         }
 
         inSymView = !inSymView
-        if (!inSymView) {
+        if (!inSymView && typeof layout.isEase === 'undefined') {
             inSymView2 = false
         }
     }

@@ -59,6 +59,7 @@ KeyBase {
     property point tempPoint: Qt.point(0,0)
     property point startPoint:Qt.point(0,0)
     property point currentPoint:Qt.point(0,0)
+    property bool swipeHighlightEnable: true
 
     property var swipeArray: attributes.isShifted ? swipeCaptionShifted : swipeCaption
 
@@ -95,7 +96,7 @@ KeyBase {
             font.pixelSize: Theme.fontSizeSmall
             color: Theme.primaryColor
             text: modelData === "" ? swipeSpecial[index] : !attributes.inSymView ? modelData : ""
-            opacity: modelData !== "" ? 0.8 : attributes.inSymView2 ? 0.5 : 0
+            opacity: modelData !== "" ? 0.8 : attributes.inSymView2 || attributes.inSymView  ? 0.5 : 0
         }
     }
 
@@ -107,7 +108,7 @@ KeyBase {
         z: -1
         color: Theme.highlightBackgroundColor
         opacity: 0.5
-        visible: pressed && showHighlight
+        visible: pressed && showHighlight && swipeHighlightEnable
     }
 
     Rectangle {
@@ -119,6 +120,7 @@ KeyBase {
         z: -1
         color: Theme.highlightBackgroundColor
         opacity: 0.3
+        visible: swipeHighlightEnable
         transformOrigin: Item.Left
 
         property real xDist: startPoint.x - currentPoint.x

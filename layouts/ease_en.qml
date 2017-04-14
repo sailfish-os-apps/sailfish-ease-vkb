@@ -66,7 +66,7 @@ KeyboardEaseLayout {
             caption:        "r"; swipeCaption:        ["", "", "", "m", "", "", "", ""]; swipeSpecial: ["|", "", "}", "", ")", "@", "", "]"];
             captionShifted: "R"; swipeCaptionShifted: ["", "", "", "M", "", "", "", ""]; symView: "6"; symView2: caption }
 
-        ShiftKey {implicitWidth: symbol.width}
+        ShiftEaseKey {implicitWidth: symbol.width}
     }
     KeyboardRow { 
         CharacterEaseKey {
@@ -79,7 +79,7 @@ KeyboardEaseLayout {
             caption:        "s"; swipeCaption:        ["f", "", "", "", "", "", "", ""]; swipeSpecial: ["", "&", "", "#", ">", ";", "", ""];
             captionShifted: "S"; swipeCaptionShifted: ["F", "", "", "", "", "", "", ""]; symView: "9"; symView2: caption }
 
-        SymbolKey {id: symbol}
+        SymbolEaseKey {id: symbol}
     }
 
     SpacebarEaseRow {}

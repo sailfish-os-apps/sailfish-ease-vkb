@@ -31,43 +31,42 @@ import QtQuick 2.0
 import com.jolla.keyboard 1.0
 import Sailfish.Silica 1.0
 
-CharacterEaseKey {
-    id: symbolKey
+FunctionKey {
+    id: shiftKey
 
     property int _charactersWhenPressed
     property bool _quickPicking
 
-    caption: attributes.inSymView ? "0" : ""
-    captionShifted: caption
-    implicitWidth: functionKeyWidth
-    keyType: KeyType.SymbolKey
-    swipeHighlightEnable: attributes.inSymView
+    implicitWidth: shiftKeyWidth
+    icon.source: (attributes.isShifted && !attributes.isShiftLocked ? "image://theme/icon-m-autocaps"
+                                                                    : "image://theme/icon-m-capslock")
+                 + (pressed ? ("?" + Theme.highlightColor) : "")
 
-    Rectangle {
-        id: backgroundItem
-        color: parent.pressed ? Theme.highlightBackgroundColor : Theme.primaryColor
-        opacity: parent.pressed ? 0.6 : 0.17
-        radius: geometry.keyRadius
-        anchors { fill: parent; margins: Theme.paddingMedium }
-        visible: !attributes.inSymView
-    }
+    // dim normal shift mode
+    icon.opacity: (!attributes.isShiftLocked && !attributes.isShifted) ? 0.2 : 1.0
+    caption: ""
+    key: Qt.Key_Shift
+    keyType: KeyType.ShiftKey
+    background.visible: false
 
-    Text {
-        id: textItem
-        anchors.centerIn: parent
-        anchors.horizontalCenterOffset: Math.round((leftPadding - rightPadding) / 2)
-        width: parent.width - leftPadding - rightPadding - 4
-        fontSizeMode: Text.HorizontalFit
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.pixelSize: Theme.fontSizeMedium
-        font.family: Theme.fontFamily
-        color: parent.pressed ? Theme.highlightColor : Theme.primaryColor
-        text: !attributes.inSymView2 ? "*.$" : "   "
-        visible: !attributes.inSymView
+    onPressedChanged: {
+        if (pressed && !keyboard.isShifted && keyboard.lastInitialKey === shiftKey) {
+            _quickPicking = true
+            keyboard.shiftState = ShiftState.LatchedShift
+        } else {
+            _quickPicking = false
+        }
+
+        _charactersWhenPressed = keyboard.characterKeyCounter
+        keyboard.shiftKeyPressed = pressed
+        keyboard.updatePopper()
     }
 
     onClicked: {
-        keyboard.inSymView2 = !keyboard.inSymView2
+        if (keyboard.characterKeyCounter > _charactersWhenPressed) {
+            keyboard.shiftState = ShiftState.NoShift
+        } else if (!_quickPicking) {
+            keyboard.cycleShift()
+        }
     }
 }
