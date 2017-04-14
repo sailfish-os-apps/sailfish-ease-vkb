@@ -241,7 +241,7 @@ Item {
 
                     var distX = point.x - point.startX
                     var distY = point.y - point.startY
-                    if (Math.abs(distX) < key.height && Math.abs(distY) < key.height) {
+                    if (Math.abs(distX) < key.height * 0.5 && Math.abs(distY) < key.height * 0.5) {
                         key.swipeValue = -1
                     } else if (Math.abs(distX) > 3 * Math.abs(distY)){
                         if (distX < 0) {
