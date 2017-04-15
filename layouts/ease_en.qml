@@ -79,7 +79,7 @@ KeyboardEaseLayout {
             caption:        "s"; swipeCaption:        ["f", "", "", "", "", "", "", ""]; swipeSpecial: ["", "&", "", "#", ">", ";", "", ""];
             captionShifted: "S"; swipeCaptionShifted: ["F", "", "", "", "", "", "", ""]; symView: "9"; symView2: caption }
 
-        SymbolEaseKey {id: symbol}
+        SymbolKey {id: symbol}
     }
 
     SpacebarEaseRow {}
