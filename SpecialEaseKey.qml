@@ -45,8 +45,8 @@ CharacterEaseKey {
 
     Rectangle {
         id: backgroundItem
-        color: parent.pressed ? Theme.highlightBackgroundColor : Theme.primaryColor
-        opacity: parent.pressed ? 0.6 : 0.17
+        color: parent.pressed || attributes.inSymView2 ? Theme.highlightBackgroundColor : Theme.primaryColor
+        opacity: parent.pressed || attributes.inSymView2 ? 0.6 : 0.17
         radius: geometry.keyRadius
         anchors { fill: parent; margins: Theme.paddingMedium }
         visible: !attributes.inSymView
@@ -63,7 +63,7 @@ CharacterEaseKey {
         font.pixelSize: Theme.fontSizeMedium
         font.family: Theme.fontFamily
         color: parent.pressed ? Theme.highlightColor : Theme.primaryColor
-        text: !attributes.inSymView2 ? "*.$" : "   "
+        text: "*.$"
         visible: !attributes.inSymView
     }
 
