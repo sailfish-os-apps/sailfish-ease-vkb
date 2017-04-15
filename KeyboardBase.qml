@@ -258,9 +258,18 @@ Item {
                         key.swipeValue = -1
                     } else if (Math.abs(distX) > 3 * Math.abs(distY)){
                         if (distX < 0) {
-                            key.swipeValue = 3
+                            if (Math.abs(distX) > key.height * 3.5) { // Special case of really long swipe
+                                key.swipeValue = -20 // SpecialValue : backSpace
+                            } else {
+                                key.swipeValue = 3
+                            }
                         } else {
-                            key.swipeValue = 4
+                            if (Math.abs(distX) > key.height * 3.5) { // Special case of really long swipe
+                                key.swipeValue = -10 // SpecialValue : space
+                            } else {
+                                key.swipeValue = 4
+                            }
+
                         }
                     } else if (Math.abs(distY) > 3 * Math.abs(distX)){
                         if (distY < 0) {
@@ -365,7 +374,17 @@ Item {
                 popper.release()
                 point.pressedKey.pressed = false
             } else {
-                triggerKey(point.pressedKey)
+                if (typeof point.pressedKey.swipeValue !== 'undefined' && point.pressedKey.swipeValue === -10) {
+                    MInputMethodQuick.sendCommit(" ")
+                    inputEaseHandler._handleKeyRelease()
+                    point.pressedKey.pressed = false
+                } else if (typeof point.pressedKey.swipeValue !== 'undefined' && point.pressedKey.swipeValue === -20) {
+                    MInputMethodQuick.sendKey(Qt.Key_Backspace, 0, "\b", Maliit.KeyClick)
+                    inputEaseHandler._handleKeyRelease()
+                    point.pressedKey.pressed = false
+                } else {
+                    triggerKey(point.pressedKey)
+                }
             }
             if (typeof point.pressedKey.tempPoint !== 'undefined') {
                 point.pressedKey.swipeValue = -1
