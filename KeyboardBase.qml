@@ -163,7 +163,7 @@ Item {
     }
 
     MouseArea {
-        enabled: useMouseEvents.value
+        enabled: useMouseEvents.value && (typeof layout.is8Pen === 'undefined')
         anchors.fill: parent
 
         onPressed: keyboard.handlePressed(createPointArray(mouse.x, mouse.y))
@@ -181,7 +181,7 @@ Item {
 
     MultiPointTouchArea {
         anchors.fill: parent
-        enabled: !useMouseEvents.value
+        enabled: !useMouseEvents.value || typeof layout.is8Pen !== 'undefined'
 
         onPressed: keyboard.handlePressed(touchPoints)
         onUpdated: keyboard.handleUpdated(touchPoints)
