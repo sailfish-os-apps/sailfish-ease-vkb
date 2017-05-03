@@ -258,13 +258,13 @@ Item {
                         key.swipeValue = -1
                     } else if (Math.abs(distX) > 3 * Math.abs(distY)){
                         if (distX < 0) {
-                            if (Math.abs(distX) > key.height * 3.5) { // Special case of really long swipe
+                            if (Math.abs(distX) > key.height * 1.6) { // Special case of really long swipe
                                 key.swipeValue = -20 // SpecialValue : backSpace
                             } else {
                                 key.swipeValue = 3
                             }
                         } else {
-                            if (Math.abs(distX) > key.height * 3.5) { // Special case of really long swipe
+                            if (Math.abs(distX) > key.height * 1.9) { // Special case of really long swipe
                                 key.swipeValue = -10 // SpecialValue : space
                             } else {
                                 key.swipeValue = 4
