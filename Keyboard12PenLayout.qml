@@ -46,6 +46,7 @@ Item {
     property var numCaption:({})
     property var specialCaption:({})
     property string selection: ""
+    property bool capitalSelected: false
     property int selectionNumber: -1
     property var selectionMapping: {"0-left": "upright", "0-right": "downright",
                                     "60-left": "downright", "60-right": "down",
@@ -103,7 +104,7 @@ Item {
                         id: charText
                         anchors.verticalCenter: parent.top
                         anchors.horizontalCenter: parent.left
-                        text: modelData
+                        text: capitalSelected && lowercase.indexOf(modelData) !== -1 ? uppercase.charAt(lowercase.indexOf(modelData)) : modelData
                         font.family: Theme.fontFamily
                         font.bold: branch.selected && selectionNumber === index ? true : false
                         font.pixelSize: Theme.fontSizeMedium
@@ -145,7 +146,6 @@ Item {
             processInput()
             moveSerie = []
             evaluateSelection()
-
         }
         //onCanceled: keyboard.handleCanceled(touchPoints)
     }
@@ -263,6 +263,11 @@ Item {
         } else {
             selection = ""
             selectionNumber = -1
+        }
+        if (moveSerie.length < 1 || moveSerie[0] === "center") {
+            capitalSelected = false
+        } else {
+            capitalSelected = true
         }
     }
 
