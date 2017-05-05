@@ -45,6 +45,14 @@ Item {
     property var letterCaptions: ({})
     property var numCaption:({})
     property var specialCaption:({})
+    property string selection: ""
+    property int selectionNumber: -1
+    property var selectionMapping: {"0-left": "upright", "0-right": "downright",
+                                    "60-left": "downright", "60-right": "down",
+                                    "120-left": "down", "120-right": "downleft",
+                                    "180-left": "downleft", "180-right": "upleft",
+                                    "240-left": "upleft", "240-right": "up",
+                                    "300-left": "up", "300-right": "upright"}
 
     Component.onCompleted: updateSizes()
     onWidthChanged: updateSizes()
@@ -52,13 +60,12 @@ Item {
 
     Rectangle {
         id: centerDot
-        property bool selected: false
         anchors.centerIn: parent
         //anchors.verticalCenterOffset: layout8Pen.parent.width / 20
         anchors.horizontalCenterOffset: - layout8Pen.parent.width / 10
         width: layout8Pen.parent.width / 4
         height: width
-        color: selected ? Theme.highlightColor : Theme.primaryColor
+        color: selection === "center" ? Theme.highlightColor : Theme.primaryColor
         opacity: 0.5
         radius: width / 2
     }
@@ -76,6 +83,8 @@ Item {
             property real sin: Math.sin(angle)
             property real cos: Math.cos(angle)
             property int side: (key.indexOf("left") !== -1 ? -1 : 1)
+            property bool selected: selectionMapping[key] === selection.split("-")[0]
+                                    && (selection.split("-").length === 1 || key.split("-")[1] === selection.split("-")[1])
 
             Repeater {
                 model: centerLetterMove[key]
@@ -96,8 +105,9 @@ Item {
                         anchors.horizontalCenter: parent.left
                         text: modelData
                         font.family: Theme.fontFamily
+                        font.bold: branch.selected && selectionNumber === index ? true : false
                         font.pixelSize: Theme.fontSizeMedium
-                        color: Theme.primaryColor
+                        color: branch.selected ? Theme.highlightColor : Theme.primaryColor
                     }
                 }
             }
@@ -112,27 +122,29 @@ Item {
             moveSerie = []
             var touchpoint = touchPoints[0]
             var pos = getPos(touchpoint.x, touchpoint.y)
-            if (pos === "center") {
-                centerDot.selected = true
-            }
             moveSerie.push(pos)
+            evaluateSelection()
         }
         onUpdated: {
             var touchpoint = touchPoints[0]
             var pos = getPos(touchpoint.x, touchpoint.y)
             if (pos !== moveSerie[moveSerie.length - 1]) {
-                if (pos === "center") {
-                    processInput()
+                if (moveSerie.length > 1 && pos === moveSerie[moveSerie.length - 2]) {
+                    moveSerie.splice(-1,1)
+                } else {
+                    if (pos === "center") {
+                        processInput()
+                    }
+                    moveSerie.push(pos)
                 }
-                moveSerie.push(pos)
             }
+            evaluateSelection()
         }
 
         onReleased: {
             processInput()
-
             moveSerie = []
-            centerDot.selected = false
+            evaluateSelection()
 
         }
         //onCanceled: keyboard.handleCanceled(touchPoints)
@@ -231,6 +243,26 @@ Item {
             } else {
                 return "up"
             }
+        }
+    }
+
+    function evaluateSelection () {
+        if (moveSerie.length === 1) {
+            selection = moveSerie[0]
+            selectionNumber = -1
+        } else if (moveSerie[0] === "center" && moveSerie.length === 2) {
+            selection = moveSerie[1]
+            selectionNumber = -1
+        } else if (moveSerie.length > 1) {
+            var startIndex = 0
+            if (moveSerie[0] === "center")
+                startIndex = 1
+            var direction = mapInput[moveSerie[startIndex] + "-" + moveSerie[startIndex + 1]].split("-")[1]
+            selection = moveSerie[startIndex] + "-" + direction
+            selectionNumber = moveSerie.length - startIndex - 2
+        } else {
+            selection = ""
+            selectionNumber = -1
         }
     }
 
