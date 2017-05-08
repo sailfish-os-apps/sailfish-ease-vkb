@@ -36,9 +36,19 @@ KeyBase {
     id: aCharKey
     height: width
 
-    property string captionShifted
-    property string symView
-    property string symView2
+    property var keyValue: {
+                                "caption":        "",
+                                "captionShifted": "",
+                                "swipeCaption":        ["", "", "", "", "", "", "", ""],
+                                "swipeCaptionShifted": ["", "", "", "", "", "", "", ""],
+                                "swipeSpecial":        ["", "", "", "", "", "", "", ""],
+                                "symView": ""
+                            }
+
+    caption: keyValue["caption"]
+    property string captionShifted: keyValue["captionShifted"]
+    property string symView: keyValue["symView"]
+    property string symView2: caption
     property int separator: SeparatorState.AutomaticSeparator
     property bool implicitSeparator: true // set by layouting
     property bool showHighlight: true
@@ -52,9 +62,9 @@ KeyBase {
     property alias fontSizeMode: textItem.fontSizeMode
     property alias textAnchors: textItem.anchors
 
-    property var swipeCaption: ["", "", "", "", "", "", "", ""]
-    property var swipeCaptionShifted: ["", "", "", "", "", "", "", ""]
-    property var swipeSpecial: ["", "", "", "", "", "", "", ""]
+    property var swipeCaption: keyValue["swipeCaption"]
+    property var swipeCaptionShifted: keyValue["swipeCaptionShifted"]
+    property var swipeSpecial: keyValue["swipeSpecial"]
     property int swipeValue: -1
     property point tempPoint: Qt.point(0,0)
     property point startPoint:Qt.point(0,0)

@@ -8,6 +8,7 @@ Column {
 
     property string type
     property bool portraitMode
+    property int rowHeight
     property int keyHeight
     property int punctuationKeyWidth
     property int punctuationKeyWidthNarrow
@@ -24,6 +25,7 @@ Column {
     property bool useTopItem: !splitActive
     property bool capsLockSupported: true
 
+    property bool isLandscape
     property bool isEase: true
     property var accentMap: ({})
     property string lastAccentMerge: ""
@@ -48,7 +50,9 @@ Column {
         }
 
         if (portraitMode) {
-            keyHeight = geometry.keyHeightPortrait
+            isLandscape = false
+            rowHeight = width * 0.75 / 4
+            keyHeight = rowHeight * 0.9 // geometry.keyHeightPortrait
             punctuationKeyWidth = geometry.punctuationKeyPortait
             punctuationKeyWidthNarrow = geometry.punctuationKeyPortraitNarrow
             shiftKeyWidth = geometry.shiftKeyWidthPortrait
@@ -58,7 +62,9 @@ Column {
             avoidanceWidth = 0
             splitActive = false
         } else {
-            keyHeight = geometry.keyHeightLandscape
+            isLandscape = true
+            rowHeight = width * 0.32 / 3
+            keyHeight = rowHeight * 0.88 // geometry.keyHeightLandscape
             punctuationKeyWidth = geometry.punctuationKeyLandscape
             punctuationKeyWidthNarrow = geometry.punctuationKeyLandscapeNarrow
             functionKeyWidth = geometry.functionKeyWidthLandscape
@@ -86,7 +92,7 @@ Column {
             child = children[i]
             child.width = width
             if (child.hasOwnProperty("followRowHeight") && child.followRowHeight) {
-                child.height = width / 5
+                child.height = rowHeight
             }
 
             if (child.maximumBasicButtonWidth !== undefined) {
