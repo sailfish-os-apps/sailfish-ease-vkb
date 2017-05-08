@@ -165,7 +165,13 @@ Item {
                             "upright-up": "300-right"}
 
     function processInput() {
-        if (moveSerie[0] === "center") {
+        if (moveSerie.length >= 8 && moveSerie[moveSerie.length - 1] !== "center") {
+            if (selection.indexOf("left") !== -1) {
+                numActive = !numActive
+            } else {
+                specialActive = !specialActive
+            }
+        } else if (moveSerie[0] === "center") {
             if (moveSerie.length >= 3 && moveSerie.length < 7) {
                 var hand = centerLetterMove[mapInput[moveSerie[1] + "-" + moveSerie[2]]]
                 var letter = hand[(moveSerie.length - 3) % 4]
@@ -327,8 +333,8 @@ Item {
         implicitWidth: shiftKeyWidth
         background.visible: false
         anchors.centerIn: parent
-        anchors.verticalCenterOffset:  - parent.height / 2 + height
-        anchors.horizontalCenterOffset:  parent.height / 2 - height
+        anchors.verticalCenterOffset:  - parent.height / 2 + height * 0.5
+        anchors.horizontalCenterOffset:  parent.height / 2
 
         property bool pressed: false
 
@@ -359,6 +365,29 @@ Item {
                     stop()
                     moveSerie = []
                 }
+            }
+        }
+    }
+
+    FunctionKey {
+        id:specialKey
+        repeat: true
+        key: Qt.Key_Backspace
+        height: width * 0.6
+        implicitWidth: shiftKeyWidth
+        background.visible: true
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset:  - parent.height / 2 - height * 0.5
+        anchors.horizontalCenterOffset:  parent.height / 2
+
+        property bool pressed: false
+
+        MultiPointTouchArea {
+            anchors.fill: backspaceKey
+            maximumTouchPoints: 1
+
+            onReleased: {
+
             }
         }
     }
