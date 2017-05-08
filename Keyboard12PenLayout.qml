@@ -33,6 +33,7 @@ Item {
     property string lastAccentMerge: ""
 
     property var moveSerie: []
+    property var fullMoveSerie: []
 
     property string lowercase: "abcdefghijklmnopqrstuvwxyz"
     property string uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -115,6 +116,7 @@ Item {
         }
     }
 
+
     MultiPointTouchArea {
         anchors.fill: parent
         maximumTouchPoints: 1
@@ -124,7 +126,11 @@ Item {
             var touchpoint = touchPoints[0]
             var pos = getPos(touchpoint.x, touchpoint.y)
             moveSerie.push(pos)
+            fullMoveSerie.push(pos)
             evaluateSelection()
+            updatePaint(touchpoint.x, touchpoint.y)
+            paint.pathData = "M%1,%2".arg (touchpoint.x).arg (touchpoint.y);
+            paint.canErase = false
         }
         onUpdated: {
             var touchpoint = touchPoints[0]
@@ -137,15 +143,22 @@ Item {
                         processInput()
                     }
                     moveSerie.push(pos)
+                    fullMoveSerie.push(pos)
                 }
             }
             evaluateSelection()
+            updatePaint(touchpoint.x, touchpoint.y)
+            paint.pathData += "L%1,%2".arg (touchpoint.x).arg (touchpoint.y);
         }
 
         onReleased: {
             processInput()
             moveSerie = []
+            fullMoveSerie = []
             evaluateSelection()
+            updatePaint()
+            paint.pathData = ""
+            paint.canErase = true
         }
         //onCanceled: keyboard.handleCanceled(touchPoints)
     }
@@ -377,13 +390,13 @@ Item {
         implicitWidth: shiftKeyWidth
         background.visible: true
         anchors.centerIn: parent
-        anchors.verticalCenterOffset:  - parent.height / 2 - height * 0.5
+        anchors.verticalCenterOffset:  - parent.height / 2 + height * 2.5
         anchors.horizontalCenterOffset:  parent.height / 2
 
         property bool pressed: false
 
         MultiPointTouchArea {
-            anchors.fill: backspaceKey
+            anchors.fill: specialKey
             maximumTouchPoints: 1
 
             onReleased: {
@@ -399,5 +412,39 @@ Item {
         anchors.verticalCenterOffset:  parent.height / 2 + height
     }
 
+    Paint {
+        id: paint
+        anchors.fill: parent
+        lineColor: Theme.primaryColor
+        lineSize: 5
+        baseOpacity: 0.5
+    }
 
+    property var angleMap: {"downright": 30 * Math.PI / 180, "down": 90 * Math.PI / 180, "downleft": 150 * Math.PI / 180, "upleft": 210 * Math.PI / 180, "up": 270 * Math.PI / 180, "upright": 330 * Math.PI / 180}
+
+    function updatePaint(x,y) {
+        /*if (x === undefined || y === undefined){
+            paint.pathData = ""
+            return
+        }
+        var path = ""
+        if (fullMoveSerie[0] === "center"){
+            path += "M%1,%2".arg (xCenter).arg (yCenter)
+        } else {
+            var angle = angleMap[fullMoveSerie[0]]
+            path += "M%1,%2".arg (xCenter + Math.cos(angle) * centerDot.width).arg (yCenter + Math.sin(angle) * centerDot.width)
+        }
+
+        for (var i = 1; i < fullMoveSerie.length; i++) {
+            var sector = fullMoveSerie[i]
+            if (sector === "center") {
+                path += "L%1,%2".arg (xCenter).arg (yCenter)
+            } else {
+                var angle = angleMap[sector]
+                path += "L%1,%2".arg (xCenter + Math.cos(angle) * centerDot.width).arg (yCenter + Math.sin(angle) * centerDot.width)
+            }
+        }
+        path += "L%1,%2".arg (x).arg (y)
+        paint.pathData = path*/
+    }
 }
