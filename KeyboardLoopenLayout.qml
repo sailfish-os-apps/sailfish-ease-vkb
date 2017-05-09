@@ -6,7 +6,7 @@ import com.meego.maliitquick 1.0
 import Sailfish.Silica 1.0
 
 Item {
-    id: layout8Pen
+    id: layoutLoopen
     width: parent ? parent.width : 0
     height: width * 0.7
 
@@ -66,12 +66,44 @@ Item {
         id: centerDot
         anchors.centerIn: parent
         //anchors.verticalCenterOffset: layout8Pen.parent.width / 20
-        anchors.horizontalCenterOffset: - layout8Pen.parent.width / 10
-        width: layout8Pen.parent.width / 4
+        anchors.horizontalCenterOffset: - layoutLoopen.parent.width / 10
+        width: layoutLoopen.parent.width / 4
         height: width
-        color: selection === "-1" ? Theme.highlightColor : Theme.primaryColor
-        opacity: 0.5
+        color: selection === "-1" ? Theme.highlightBackgroundColor : Theme.primaryColor
+        opacity: selection === "-1" ? 0.6 : 0.07
         radius: width / 2
+
+
+    }
+
+    Text {
+        id: textField
+        anchors.centerIn: centerDot
+        width: centerDot.width - 2*x
+        height: centerDot.height
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        text: languageCode
+        color: Theme.primaryColor
+        opacity: 0.4
+        font.pixelSize: Theme.fontSizeSmall
+        fontSizeMode: Text.Fit
+    }
+
+    Timer {
+        id: languageSwitchTimer
+        interval: 1000
+        onTriggered: {
+            var point = new Object
+            point.pointId = 1
+            point.x = xCenter
+            point.y = yCenter
+            point.startX = xCenter
+            point.startY = yCenter
+            point.pressedKey = centerDot
+            point.initialKey = null
+            keyboard.languageSelectionItem.show(point)
+        }
     }
 
     property real xCenter: centerDot.x + centerDot.width / 2
@@ -155,9 +187,23 @@ Item {
             evaluateSelection()
             paint.pathData = "M%1,%2".arg (touchpoint.x).arg (touchpoint.y);
             paint.canErase = false
+            if (pos === -1)
+                languageSwitchTimer.start()
         }
         onUpdated: {
             var touchpoint = touchPoints[0]
+            if (keyboard.languageSelectionItem.visible) {
+                var point = new Object
+                point.pointId = 1
+                point.x = touchpoint.x
+                point.y = touchpoint.y
+                point.startX = xCenter
+                point.startY = yCenter
+                point.pressedKey = centerDot
+                point.initialKey = null
+                keyboard.languageSelectionItem.handleMove(point)
+                return
+            }
             var pos = getPos(touchpoint.x, touchpoint.y)
             if (pos !== moveSerie[moveSerie.length - 1]) {
                 if (moveSerie.length > 1 && pos === moveSerie[moveSerie.length - 2]) {
@@ -167,6 +213,7 @@ Item {
                         processInput()
                     }
                     moveSerie.push(pos)
+                    languageSwitchTimer.stop()
                     fullMoveSerie.push(pos)
                 }
             }
@@ -175,12 +222,19 @@ Item {
         }
 
         onReleased: {
-            processInput()
+            if (!keyboard.languageSelectionItem.visible) {
+                processInput()
+            }
+            if (keyboard.languageSelectionItem.visible) {
+                canvas.switchLayout(keyboard.languageSelectionItem.activeCell)
+                keyboard.languageSelectionItem.hide()
+            }
             moveSerie = []
             fullMoveSerie = []
             evaluateSelection()
             paint.pathData = ""
             paint.canErase = true
+            languageSwitchTimer.stop()
         }
     }
 

@@ -99,6 +99,7 @@ Item {
         visible: (typeof layout.isEase === 'undefined')
     }
 
+    property var languageSelectionItem: languageSelectionPopup
     LanguageSelectionPopup {
         id: languageSelectionPopup
         z: 11
