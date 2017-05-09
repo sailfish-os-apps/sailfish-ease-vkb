@@ -50,16 +50,13 @@ KeyboardEaseLayout {
 
     KeyboardRow {
         splitIndex: 3
+        visible: mylay.isLandscape
 
-        CharacterEaseKey { keyValue: easeLayout["topLeft"] }
-        CharacterEaseKey { keyValue: easeLayout["top"] }
-        CharacterEaseKey { keyValue: easeLayout["topRight"] }
-
-        BackspaceKey { implicitWidth: symbol.width; active: !mylay.isLandscape }
+        SpecialEaseKey { active: mylay.isLandscape}
         KeyBase {
-            implicitWidth: symbol.width * 3
-            active: mylay.isLandscape
+            implicitWidth: symbol.width * 2.7
             clip: true
+            active: mylay.isLandscape
 
             Loader {
                 id: topItem
@@ -68,37 +65,17 @@ KeyboardEaseLayout {
                 anchors.leftMargin: symbol.width / 2
             }
         }
-
-
+        ShiftEaseKey   { active: mylay.isLandscape }
+        BackspaceKey   { active: mylay.isLandscape }
+        SpecialEaseKey { active: mylay.isLandscape }
     }
-
     KeyboardRow {
         splitIndex: 3
 
-        CharacterEaseKey { keyValue: easeLayout["left"] }
-        CharacterEaseKey { keyValue: easeLayout["center"] }
-        CharacterEaseKey { keyValue: easeLayout["right"] }
+        CharacterEaseKey { keyValue: easeLayout["topLeft"] }
+        CharacterEaseKey { keyValue: easeLayout["top"] }
+        CharacterEaseKey { keyValue: easeLayout["topRight"] }
 
-        SpecialEaseKey { active: mylay.isLandscape}
-        ShiftEaseKey { implicitWidth: symbol.width;  active: !mylay.isLandscape }
-        SymbolKey    { active: mylay.isLandscape}
-        BackspaceKey { implicitWidth: symbol.width; active: mylay.isLandscape }
-    }
-
-    KeyboardRow {
-        splitIndex: 3
-
-
-        CharacterEaseKey { keyValue: easeLayout["bottomLeft"] }
-        CharacterEaseKey { keyValue: easeLayout["bottom"] }
-        CharacterEaseKey { keyValue: easeLayout["bottomRight"] }
-
-        SymbolKey {
-            id: symbol
-            active: !mylay.isLandscape
-        }
-        ShiftEaseKey { active: mylay.isLandscape && !splitActive}
-        SpacebarKey  { active: mylay.isLandscape }
         FunctionKey { // copied  EnterKey: i don't know why but it doesn't like as an element
                   active: mylay.isLandscape
                   icon.source: MInputMethodQuick.actionKeyOverride.icon
@@ -108,6 +85,40 @@ KeyboardEaseLayout {
                   enabled: MInputMethodQuick.actionKeyOverride.enabled
                   background.opacity: pressed ? 0.6 : MInputMethodQuick.actionKeyOverride.highlighted ? 0.4 : 0.17
         }
+        BackspaceKey { implicitWidth: symbol.width; active: !mylay.isLandscape }
+
+        CharacterEaseKey { keyValue: easeLayout["topLeft"];  active: mylay.isLandscape }
+        CharacterEaseKey { keyValue: easeLayout["top"];      active: mylay.isLandscape }
+        CharacterEaseKey { keyValue: easeLayout["topRight"]; active: mylay.isLandscape }
+    }
+    KeyboardRow {
+        splitIndex: 3
+
+        CharacterEaseKey { keyValue: easeLayout["left"] }
+        CharacterEaseKey { keyValue: easeLayout["center"] }
+        CharacterEaseKey { keyValue: easeLayout["right"] }
+
+        SymbolKey    { active: mylay.isLandscape}
+        ShiftEaseKey { implicitWidth: symbol.width;   active: !mylay.isLandscape }
+
+        CharacterEaseKey { keyValue: easeLayout["left"];   active: mylay.isLandscape }
+        CharacterEaseKey { keyValue: easeLayout["center"]; active: mylay.isLandscape }
+        CharacterEaseKey { keyValue: easeLayout["right"];  active: mylay.isLandscape }
+    }
+    KeyboardRow {
+        splitIndex: 3
+
+        CharacterEaseKey { keyValue: easeLayout["bottomLeft"] }
+        CharacterEaseKey { keyValue: easeLayout["bottom"] }
+        CharacterEaseKey { keyValue: easeLayout["bottomRight"] }
+
+        SymbolKey    { id: symbol; active: !mylay.isLandscape }
+        SpacebarKey  { id: spaceBar; active: mylay.isLandscape }
+
+
+        CharacterEaseKey { keyValue: easeLayout["bottomLeft"];  active: mylay.isLandscape }
+        CharacterEaseKey { keyValue: easeLayout["bottom"];      active: mylay.isLandscape }
+        CharacterEaseKey { keyValue: easeLayout["bottomRight"]; active: mylay.isLandscape }
     } 
     SpacebarEaseRow {visible: portraitMode ? true : false}
 }

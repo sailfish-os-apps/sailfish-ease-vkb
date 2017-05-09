@@ -63,7 +63,7 @@ Column {
             splitActive = false
         } else {
             isLandscape = true
-            rowHeight = width * 0.32 / 3
+            rowHeight = width * 0.32 / 4
             keyHeight = rowHeight * 0.88 // geometry.keyHeightLandscape
             punctuationKeyWidth = geometry.punctuationKeyLandscape
             punctuationKeyWidthNarrow = geometry.punctuationKeyLandscapeNarrow
