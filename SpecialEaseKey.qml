@@ -68,6 +68,7 @@ CharacterEaseKey {
     }
 
     onClicked: {
-        keyboard.inSymView2 = !keyboard.inSymView2
+        if (!keyboard.inSymView)
+            keyboard.inSymView2 = !keyboard.inSymView2
     }
 }
