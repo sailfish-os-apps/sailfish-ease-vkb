@@ -48,26 +48,7 @@ KeyboardEaseLayout {
 
     property var easeLayout: ({})
 
-    KeyboardRow {
-        visible: mylay.isLandscape
 
-        SpecialEaseKey { active: mylay.isLandscape}
-        KeyBase {
-            implicitWidth: symbol.width * 2.7
-            clip: true
-            active: mylay.isLandscape
-
-            Loader {
-                id: topItem
-                sourceComponent: mylay.isLandscape && keyboard.inputHandler ? keyboard.inputHandler.topItem : null
-                anchors.fill: parent
-                anchors.leftMargin: symbol.width / 2
-            }
-        }
-        ShiftEaseKey   { active: mylay.isLandscape }
-        BackspaceKey   { active: mylay.isLandscape }
-        SpecialEaseKey { active: mylay.isLandscape }
-    }
     KeyboardRow {
         CharacterEaseKey { keyValue: easeLayout["topLeft"] }
         CharacterEaseKey { keyValue: easeLayout["top"] }
@@ -105,8 +86,8 @@ KeyboardEaseLayout {
         CharacterEaseKey { keyValue: easeLayout["bottom"] }
         CharacterEaseKey { keyValue: easeLayout["bottomRight"] }
 
-        SymbolKey    { id: symbol; active: !mylay.isLandscape }
-        SpacebarKey  { id: spaceBar; active: mylay.isLandscape }
+        SymbolKey      { id: symbol; active: !mylay.isLandscape }
+        SpecialEaseKey { active: mylay.isLandscape; fixedWidth: true; implicitWidth: symbol.width;}
 
 
         CharacterEaseKey { keyValue: easeLayout["bottomLeft"];  active: mylay.isLandscape }
@@ -114,4 +95,27 @@ KeyboardEaseLayout {
         CharacterEaseKey { keyValue: easeLayout["bottomRight"]; active: mylay.isLandscape }
     } 
     SpacebarEaseRow {visible: portraitMode ? true : false}
+
+
+    KeyboardRow {
+        id: landscapebottomrow
+        visible: mylay.isLandscape
+
+        SpacebarKey { active: mylay.isLandscape }
+        KeyBase {
+            implicitWidth: symbol.width * 2.7
+            clip: true
+            active: mylay.isLandscape
+
+            Loader {
+                id: topItem
+                sourceComponent: mylay.isLandscape && keyboard.inputHandler ? keyboard.inputHandler.topItem : null
+                anchors.fill: parent
+                anchors.leftMargin: symbol.width / 2
+            }
+        }
+        ShiftEaseKey { active: mylay.isLandscape }
+        BackspaceKey { active: mylay.isLandscape }
+        SpacebarKey  { active: mylay.isLandscape }
+    }
 }
