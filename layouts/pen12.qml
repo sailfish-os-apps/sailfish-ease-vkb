@@ -31,7 +31,7 @@ import QtQuick 2.0
 import ".."
 import Sailfish.Silica 1.0
 
-Keyboard12PenLayout {
+KeyboardLoopenLayout {
     letterCaptions:
     {
                 "0-left":    ["h", "p", "."],
