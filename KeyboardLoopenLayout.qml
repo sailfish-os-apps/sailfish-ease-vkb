@@ -8,7 +8,7 @@ import Sailfish.Silica 1.0
 Item {
     id: layoutLoopen
     width: parent ? parent.width : 0
-    height: width * 0.7
+    height: portraitMode ? width * 0.7 : width * 0.3
 
     property string type
     property bool portraitMode
@@ -67,7 +67,7 @@ Item {
         anchors.centerIn: parent
         //anchors.verticalCenterOffset: layout8Pen.parent.width / 20
         anchors.horizontalCenterOffset: - layoutLoopen.parent.width / 10
-        width: layoutLoopen.parent.width / 4
+        width: layoutLoopen.parent.height / (4 * 0.7)
         height: width
         color: selection === "-1" ? Theme.highlightBackgroundColor : Theme.primaryColor
         opacity: selection === "-1" ? 0.6 : 0.07
