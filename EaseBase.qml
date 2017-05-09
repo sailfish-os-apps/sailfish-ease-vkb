@@ -33,7 +33,7 @@ import Sailfish.Silica 1.0
 
 KeyboardEaseLayout {
     id: mylay
-    splitSupported: true
+    splitSupported: false
     useTopItem: !mylay.isLandscape
     height: portraitMode ? width * .75 : width * .32
     accentMap: {
@@ -49,7 +49,6 @@ KeyboardEaseLayout {
     property var easeLayout: ({})
 
     KeyboardRow {
-        splitIndex: 3
         visible: mylay.isLandscape
 
         SpecialEaseKey { active: mylay.isLandscape}
@@ -70,8 +69,6 @@ KeyboardEaseLayout {
         SpecialEaseKey { active: mylay.isLandscape }
     }
     KeyboardRow {
-        splitIndex: 3
-
         CharacterEaseKey { keyValue: easeLayout["topLeft"] }
         CharacterEaseKey { keyValue: easeLayout["top"] }
         CharacterEaseKey { keyValue: easeLayout["topRight"] }
@@ -92,8 +89,6 @@ KeyboardEaseLayout {
         CharacterEaseKey { keyValue: easeLayout["topRight"]; active: mylay.isLandscape }
     }
     KeyboardRow {
-        splitIndex: 3
-
         CharacterEaseKey { keyValue: easeLayout["left"] }
         CharacterEaseKey { keyValue: easeLayout["center"] }
         CharacterEaseKey { keyValue: easeLayout["right"] }
@@ -106,8 +101,6 @@ KeyboardEaseLayout {
         CharacterEaseKey { keyValue: easeLayout["right"];  active: mylay.isLandscape }
     }
     KeyboardRow {
-        splitIndex: 3
-
         CharacterEaseKey { keyValue: easeLayout["bottomLeft"] }
         CharacterEaseKey { keyValue: easeLayout["bottom"] }
         CharacterEaseKey { keyValue: easeLayout["bottomRight"] }
