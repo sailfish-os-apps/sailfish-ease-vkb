@@ -29,7 +29,15 @@ Item {
     property bool capsLockSupported: true
 
     property bool is8Pen: true
-    property var accentMap: ({})
+    property var accentMap: {
+        "´": {"e": "é", "E": "É", "a": "á", "A": "Á", "o": "ó", "O": "Ó", "i": "í", "I": "Í", "u": "ú", "U": "Ú", "y": "ý", "Y": "Ý"                   },
+        "^": {"e": "ê", "E": "Ê", "a": "â", "A": "Â", "o": "ô", "O": "Ô", "i": "î", "I": "Î", "u": "û", "U": "Û"                                       },
+        "¨": {"e": "ë", "E": "Ë", "a": "ä", "A": "Ä", "o": "ö", "O": "Ö", "i": "ï", "I": "Ï", "u": "ü", "U": "Ü", "y": "ÿ", "Y": "Ϋ"                   },
+        "`": {"e": "è", "E": "È", "a": "à", "A": "À", "o": "ò", "O": "Ò", "i": "ì", "I": "Ì", "u": "ù", "U": "Ù"                                       },
+        "°": {                    "a": "å", "A": "Å"                                                                                                   },
+        "~": {                    "a": "ã", "A": "Ã", "o": "õ", "O": "Õ"                                                           , "n": "ñ", "N": "Ñ"},
+        "¸": {"c": "ç", "C": "Ç"}
+    }
     property string lastAccentMerge: ""
 
     property var moveSerie: []
@@ -49,12 +57,6 @@ Item {
     property string selection: ""
     property bool capitalSelected: false
     property int selectionNumber: -1
-    property var selectionMapping: {"0-left": "upright", "0-right": "downright",
-                                    "60-left": "downright", "60-right": "down",
-                                    "120-left": "down", "120-right": "downleft",
-                                    "180-left": "downleft", "180-right": "upleft",
-                                    "240-left": "upleft", "240-right": "up",
-                                    "300-left": "up", "300-right": "upright"}
 
     Component.onCompleted: updateSizes()
     onWidthChanged: updateSizes()
@@ -67,7 +69,7 @@ Item {
         anchors.horizontalCenterOffset: - layout8Pen.parent.width / 10
         width: layout8Pen.parent.width / 4
         height: width
-        color: selection === "center" ? Theme.highlightColor : Theme.primaryColor
+        color: selection === "-1" ? Theme.highlightColor : Theme.primaryColor
         opacity: 0.5
         radius: width / 2
     }
@@ -75,6 +77,25 @@ Item {
     property real xCenter: centerDot.x + centerDot.width / 2
     property real yCenter: centerDot.y + centerDot.height / 2
 
+    property var branchAngles: {
+        var ret = []
+        var keys = Object.keys(centerLetterMove)
+        for (var i = 0; i < keys.length; i++) {
+            var angle = parseInt(keys[i].split("-")[0])
+            if (ret.indexOf(angle) === -1) {
+                for (var j = 0; j < ret.length; j++) {
+                    if (ret[j] > angle) {
+                        ret.splice(j,0,angle)
+                        break
+                    }
+                }
+                if (ret.indexOf(angle) === -1) {
+                    ret.push(angle)
+                }
+            }
+        }
+        return ret
+    }
     Repeater {
         model: Object.keys(centerLetterMove)
         delegate: Item {
@@ -85,8 +106,12 @@ Item {
             property real sin: Math.sin(angle)
             property real cos: Math.cos(angle)
             property int side: (key.indexOf("left") !== -1 ? -1 : 1)
-            property bool selected: selectionMapping[key] === selection.split("-")[0]
-                                    && (selection.split("-").length === 1 || key.split("-")[1] === selection.split("-")[1])
+            property bool selected: selection !== "-1" && selection !== "-2"
+                                    && (selection.indexOf("-") !== -1
+                                        ? selection === key
+                                        : (key.indexOf("right") !== -1
+                                           ? branchAngles[parseInt(selection)] === parseInt (key.split("-")[0])
+                                           : branchAngles[(parseInt(selection) + 1) % branchAngles.length] === parseInt (key.split("-")[0])))
 
             Repeater {
                 model: centerLetterMove[key]
@@ -128,7 +153,6 @@ Item {
             moveSerie.push(pos)
             fullMoveSerie.push(pos)
             evaluateSelection()
-            updatePaint(touchpoint.x, touchpoint.y)
             paint.pathData = "M%1,%2".arg (touchpoint.x).arg (touchpoint.y);
             paint.canErase = false
         }
@@ -139,7 +163,7 @@ Item {
                 if (moveSerie.length > 1 && pos === moveSerie[moveSerie.length - 2]) {
                     moveSerie.splice(-1,1)
                 } else {
-                    if (pos === "center") {
+                    if (pos === -1) {
                         processInput()
                     }
                     moveSerie.push(pos)
@@ -147,7 +171,6 @@ Item {
                 }
             }
             evaluateSelection()
-            updatePaint(touchpoint.x, touchpoint.y)
             paint.pathData += "L%1,%2".arg (touchpoint.x).arg (touchpoint.y);
         }
 
@@ -156,57 +179,32 @@ Item {
             moveSerie = []
             fullMoveSerie = []
             evaluateSelection()
-            updatePaint()
             paint.pathData = ""
             paint.canErase = true
         }
-        //onCanceled: keyboard.handleCanceled(touchPoints)
     }
 
-    property var mapInput: {"upleft-up": "240-left",
-                            "downleft-upleft": "180-left",
-                            "down-downleft": "120-left",
-                            "downright-down": "60-left",
-                            "upright-downright": "0-left",
-                            "up-upright": "300-left",
-
-                            "up-upleft": "240-right",
-                            "upleft-downleft": "180-right",
-                            "downleft-down": "120-right",
-                            "down-downright": "60-right",
-                            "downright-upright": "0-right",
-                            "upright-up": "300-right"}
-
     function processInput() {
-        if (moveSerie.length >= 8 && moveSerie[moveSerie.length - 1] !== "center") {
-            if (selection.indexOf("left") !== -1) {
-                numActive = !numActive
-            } else {
-                specialActive = !specialActive
-            }
-        } else if (moveSerie[0] === "center") {
+        var letter = "_"
+        var idxOff = (moveSerie[0] === -1 ? 0 : -1)
+        if ((moveSerie.length >= 3 && moveSerie[0] === -1) || (moveSerie.length >= 2 && moveSerie[0] !== -1)) {
+            var direction = moveSerie[2 + idxOff] === (moveSerie[1 + idxOff] + 1) % branchAngles.length ? "left" : "right"
+            var branchAngle = branchAngles[(direction === "left" ? (moveSerie[1 + idxOff] + 1) : moveSerie[1 + idxOff]) % branchAngles.length]
+            var branchKey = branchAngle + "-" + direction
+            var branch = centerLetterMove[branchKey]
+            letter = branch[(moveSerie.length - 3 - idxOff) % 4]
+        }
+        if (moveSerie[0] === -1) {
             if (moveSerie.length >= 3 && moveSerie.length < 7) {
-                var hand = centerLetterMove[mapInput[moveSerie[1] + "-" + moveSerie[2]]]
-                var letter = hand[(moveSerie.length - 3) % 4]
                 commitText(letter)
-            } else if (moveSerie.length === 2 && moveSerie[1] === "up") {
-                numActive = !numActive
-            } else if (moveSerie.length === 2 && moveSerie[1] === "left") {
-                specialActive = !specialActive
-            } else if (moveSerie.length === 2 && moveSerie[1] === "right") {
-                backSpace()
             } else {
                 commitText(" ")
             }
-        } else if (moveSerie.length >= 2 && moveSerie.length < 6 && moveSerie[moveSerie.length - 1] !== "center") {
-            var hand = centerLetterMove[mapInput[moveSerie[0] + "-" + moveSerie[1]]]
-            var letter = hand[(moveSerie.length - 2) % 4]
+        } else if (moveSerie.length >= 2 && moveSerie.length < 6) {
             if (lowercase.indexOf(letter) !== -1) {
                 letter = uppercase.charAt(lowercase.indexOf(letter))
             }
             commitText(letter)
-        } else if (moveSerie.length === 2 && moveSerie[1] === "center") {
-            backSpace()
         }
         moveSerie = []
     }
@@ -242,48 +240,38 @@ Item {
     function getPos(x, y) {
         var xDistFromCenter = x - xCenter
         var yDistFromCenter = y - yCenter
-        var sqrt3 = Math.sqrt(3)
-        if (Math.abs(xDistFromCenter) <= centerDot.radius && Math.abs(yDistFromCenter) <= centerDot.radius) {
-            return "center"
-        } else if (yDistFromCenter > 0) {
-            if (xDistFromCenter < 0 &&  Math.abs(xDistFromCenter) * sqrt3 > Math.abs(yDistFromCenter)) {
-                return "downleft"
-            } else if (xDistFromCenter > 0 &&  Math.abs(xDistFromCenter) * sqrt3 > Math.abs(yDistFromCenter)){
-                return "downright"
-            } else {
-                return "down"
-            }
-
-        } else {
-            if (xDistFromCenter < 0 &&  Math.abs(xDistFromCenter) * sqrt3 > Math.abs(yDistFromCenter)) {
-                return "upleft"
-            } else if (xDistFromCenter > 0 &&  Math.abs(xDistFromCenter) * sqrt3 > Math.abs(yDistFromCenter)){
-                return "upright"
-            } else {
-                return "up"
+        if (Math.abs(xDistFromCenter) <= centerDot.radius && Math.abs(yDistFromCenter) <= centerDot.radius)
+            return -1
+        var rad = Math.atan2(yDistFromCenter, xDistFromCenter);
+        var angle = (rad * (180 / Math.PI) + 360) % 360
+        for (var i = 0; i < branchAngles.length; i++) {
+            if (branchAngles[i] > angle) {
+                return (i + branchAngles.length - 1) % branchAngles.length
             }
         }
+        return (i - 1) % branchAngles.length
     }
 
     function evaluateSelection () {
         if (moveSerie.length === 1) {
             selection = moveSerie[0]
             selectionNumber = -1
-        } else if (moveSerie[0] === "center" && moveSerie.length === 2) {
+        } else if (moveSerie[0] === -1 && moveSerie.length === 2) {
             selection = moveSerie[1]
             selectionNumber = -1
         } else if (moveSerie.length > 1) {
             var startIndex = 0
-            if (moveSerie[0] === "center")
+            if (moveSerie[0] === -1)
                 startIndex = 1
-            var direction = mapInput[moveSerie[startIndex] + "-" + moveSerie[startIndex + 1]].split("-")[1]
-            selection = moveSerie[startIndex] + "-" + direction
+            var direction = moveSerie[1 + startIndex] === (moveSerie[startIndex] + 1) % branchAngles.length ? "left" : "right"
+            var branchAngle = branchAngles[(direction === "left" ? (moveSerie[startIndex] + 1) : moveSerie[startIndex]) % branchAngles.length]
+            selection = branchAngle + "-" + direction
             selectionNumber = moveSerie.length - startIndex - 2
         } else {
-            selection = ""
+            selection = -2
             selectionNumber = -1
         }
-        if (moveSerie.length < 1 || moveSerie[0] === "center") {
+        if (moveSerie.length < 1 || moveSerie[0] === -1) {
             capitalSelected = false
         } else {
             capitalSelected = true
@@ -418,33 +406,5 @@ Item {
         lineColor: Theme.primaryColor
         lineSize: 5
         baseOpacity: 0.5
-    }
-
-    property var angleMap: {"downright": 30 * Math.PI / 180, "down": 90 * Math.PI / 180, "downleft": 150 * Math.PI / 180, "upleft": 210 * Math.PI / 180, "up": 270 * Math.PI / 180, "upright": 330 * Math.PI / 180}
-
-    function updatePaint(x,y) {
-        /*if (x === undefined || y === undefined){
-            paint.pathData = ""
-            return
-        }
-        var path = ""
-        if (fullMoveSerie[0] === "center"){
-            path += "M%1,%2".arg (xCenter).arg (yCenter)
-        } else {
-            var angle = angleMap[fullMoveSerie[0]]
-            path += "M%1,%2".arg (xCenter + Math.cos(angle) * centerDot.width).arg (yCenter + Math.sin(angle) * centerDot.width)
-        }
-
-        for (var i = 1; i < fullMoveSerie.length; i++) {
-            var sector = fullMoveSerie[i]
-            if (sector === "center") {
-                path += "L%1,%2".arg (xCenter).arg (yCenter)
-            } else {
-                var angle = angleMap[sector]
-                path += "L%1,%2".arg (xCenter + Math.cos(angle) * centerDot.width).arg (yCenter + Math.sin(angle) * centerDot.width)
-            }
-        }
-        path += "L%1,%2".arg (x).arg (y)
-        paint.pathData = path*/
     }
 }
