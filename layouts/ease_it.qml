@@ -31,56 +31,34 @@ import QtQuick 2.0
 import ".."
 import Sailfish.Silica 1.0
 
-KeyboardEaseLayout {
-    accentMap: {
-        "´": {"e": "é", "E": "É", "a": "á", "A": "Á", "o": "ó", "O": "Ó", "i": "í", "I": "Í", "u": "ú", "U": "Ú", "y": "ý", "Y": "Ý"                   },
-        "^": {"e": "ê", "E": "Ê", "a": "â", "A": "Â", "o": "ô", "O": "Ô", "i": "î", "I": "Î", "u": "û", "U": "Û"                                       },
-        "¨": {"e": "ë", "E": "Ë", "a": "ä", "A": "Ä", "o": "ö", "O": "Ö", "i": "ï", "I": "Ï", "u": "ü", "U": "Ü", "y": "ÿ", "Y": "Ϋ"                   },
-        "`": {"e": "è", "E": "È", "a": "à", "A": "À", "o": "ò", "O": "Ò", "i": "ì", "I": "Ì", "u": "ù", "U": "Ù"                                       },
-        "°": {                    "a": "å", "A": "Å"                                                                                                   },
-        "~": {                    "a": "ã", "A": "Ã", "o": "õ", "O": "Õ"                                                           , "n": "ñ", "N": "Ñ"},
-        "¸": {"c": "ç", "C": "Ç"}
+EaseBase {
+    easeLayout: {
+        "topLeft": {
+            "caption":        "a", "swipeCaption":        ["", "", "", "", "", "", "", "v"], "swipeSpecial": ["", "", "", "", "-", "£", "", ""],
+            "captionShifted": "A", "swipeCaptionShifted": ["", "", "", "", "", "", "", "V"], "symView": "1" },
+        "top": {
+            "caption":        "n", "swipeCaption":        ["", "", "", "", "", "", "h", ""], "swipeSpecial": ["`", "^", "´", "+", "!", "/", "", "\\"],
+            "captionShifted": "N", "swipeCaptionShifted": ["", "", "", "", "", "", "H", ""], "symView": "2" },
+        "topRight": {
+            "caption":        "i", "swipeCaption":        ["", "", "", "", "", "x", "", ""], "swipeSpecial": ["¨", "°", "¸", "?", "", "", "=", "€"],
+            "captionShifted": "I", "swipeCaptionShifted": ["", "", "", "", "", "X", "", ""], "symView": "3" },
+        "left": {
+            "caption":        "l", "swipeCaption":        ["", "", "", "", "k", "", "", ""], "swipeSpecial": ["{", "", "%", "(", "", "[", "", "_"],
+            "captionShifted": "L", "swipeCaptionShifted": ["", "", "", "", "K", "", "", ""], "symView": "4" },
+        "center": {
+            "caption":        "o", "swipeCaption":        ["q", "u", "p", "c", "b", "g", "d", "j"], "swipeSpecial": ["", "", "", "", "", "", "", ""],
+            "captionShifted": "O", "swipeCaptionShifted": ["Q", "U", "P", "C", "B", "G", "D", "J"], "symView": "5" },
+        "right": {
+            "caption":        "r", "swipeCaption":        ["", "", "", "m", "", "", "", ""], "swipeSpecial": ["|", "", "}", "", ")", "@", "", "]"],
+            "captionShifted": "R", "swipeCaptionShifted": ["", "", "", "M", "", "", "", ""], "symView": "6" },
+        "bottomLeft": {
+            "caption":        "t", "swipeCaption":        ["", "", "y", "", "", "", "", ""], "swipeSpecial": ["~", "", "", "<", "*", "", "", ""],
+            "captionShifted": "T", "swipeCaptionShifted": ["", "", "Y", "", "", "", "", ""], "symView": "7" },
+        "bottom": {
+            "caption":        "e", "swipeCaption":        ["", "w", "", "", "z", "", "", ""], "swipeSpecial": ["\"", "", "'", "", "", ",", ".", ":"],
+            "captionShifted": "E", "swipeCaptionShifted": ["", "W", "", "", "Z", "", "", ""], "symView": "8" },
+        "bottomRight": {
+            "caption":        "s", "swipeCaption":        ["f", "", "", "", "", "", "", ""], "swipeSpecial": ["", "&", "", "#", ">", ";", "", ""],
+            "captionShifted": "S", "swipeCaptionShifted": ["F", "", "", "", "", "", "", ""], "symView": "9" }
     }
-
-    KeyboardRow { 
-        CharacterEaseKey {
-            caption:        "a"; swipeCaption:        ["", "", "", "", "", "", "", "v"]; swipeSpecial: ["", "", "", "", "-", "£", "", ""];
-            captionShifted: "A"; swipeCaptionShifted: ["", "", "", "", "", "", "", "V"]; symView: "1"; symView2: caption }
-        CharacterEaseKey {
-            caption:        "n"; swipeCaption:        ["", "", "", "", "", "", "h", ""]; swipeSpecial: ["`", "^", "´", "+", "!", "/", "", "\\"];
-            captionShifted: "N"; swipeCaptionShifted: ["", "", "", "", "", "", "H", ""]; symView: "2"; symView2: caption }
-        CharacterEaseKey {
-            caption:        "i"; swipeCaption:        ["", "", "", "", "", "x", "", ""]; swipeSpecial: ["¨", "°", "¸", "?", "", "", "=", "€"];
-            captionShifted: "I"; swipeCaptionShifted: ["", "", "", "", "", "X", "", ""]; symView: "3"; symView2: caption }
-
-        BackspaceKey {implicitWidth: symbol.width}
-    }
-    KeyboardRow { 
-        CharacterEaseKey {
-            caption:        "l"; swipeCaption:        ["", "", "", "", "k", "", "", ""]; swipeSpecial: ["{", "", "%", "(", "", "[", "", "_"];
-            captionShifted: "L"; swipeCaptionShifted: ["", "", "", "", "K", "", "", ""]; symView: "4"; symView2: caption }
-        CharacterEaseKey {
-            caption:        "o"; swipeCaption:        ["q", "u", "p", "c", "b", "g", "d", "j"]; swipeSpecial: ["", "", "", "", "", "", "", ""];
-            captionShifted: "O"; swipeCaptionShifted: ["Q", "U", "P", "C", "B", "G", "D", "J"]; symView: "5"; symView2: caption }
-        CharacterEaseKey {
-            caption:        "r"; swipeCaption:        ["", "", "", "m", "", "", "", ""]; swipeSpecial: ["|", "", "}", "", ")", "@", "", "]"];
-            captionShifted: "R"; swipeCaptionShifted: ["", "", "", "M", "", "", "", ""]; symView: "6"; symView2: caption }
-
-        ShiftEaseKey {implicitWidth: symbol.width}
-    }
-    KeyboardRow { 
-        CharacterEaseKey {
-            caption:        "t"; swipeCaption:        ["", "", "y", "", "", "", "", ""]; swipeSpecial: ["~", "", "", "<", "*", "", "", ""];
-            captionShifted: "T"; swipeCaptionShifted: ["", "", "Y", "", "", "", "", ""]; symView: "7"; symView2: caption }
-        CharacterEaseKey {
-            caption:        "e"; swipeCaption:        ["", "w", "", "", "z", "", "", ""]; swipeSpecial: ["\"", "", "'", "", "", ",", ".", ":"];
-            captionShifted: "E"; swipeCaptionShifted: ["", "W", "", "", "Z", "", "", ""]; symView: "8"; symView2: caption }
-        CharacterEaseKey {
-            caption:        "s"; swipeCaption:        ["f", "", "", "", "", "", "", ""]; swipeSpecial: ["", "&", "", "#", ">", ";", "", ""];
-            captionShifted: "S"; swipeCaptionShifted: ["F", "", "", "", "", "", "", ""]; symView: "9"; symView2: caption }
-
-        SymbolKey {id: symbol}
-    }
-
-    SpacebarEaseRow {}
 }
