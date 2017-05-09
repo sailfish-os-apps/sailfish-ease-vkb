@@ -24,7 +24,7 @@ Item {
         onTriggered: {
             var now = Date.now()
             if (now - lastUpdate > 100 && canErase) {
-                paint.opacity -= 0.1
+                paint.opacity -= 0.05
             } else {
                 paint.opacity = baseOpacity
             }

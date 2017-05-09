@@ -404,7 +404,7 @@ Item {
         id: paint
         anchors.fill: parent
         lineColor: Theme.primaryColor
-        lineSize: 5
-        baseOpacity: 0.5
+        lineSize: 10
+        baseOpacity: 0.3
     }
 }
