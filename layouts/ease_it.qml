@@ -31,7 +31,7 @@ import QtQuick 2.0
 import ".."
 import Sailfish.Silica 1.0
 
-KeyboardEaseLayout {
+EaseBase {
     easeLayout: {
         "topLeft": {
             "caption":        "a", "swipeCaption":        ["", "", "", "", "", "", "", "v"], "swipeSpecial": ["", "", "", "", "-", "£", "", ""],
