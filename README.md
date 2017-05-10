@@ -5,7 +5,7 @@
 
 # Sailfish Loopen virtual Keyboard
 
-![Preview](https://youtu.be/ABPYkV7qKq0 "Sailfish Loopen keyboard Preview")
+[![Preview](https://img.youtube.com/vi/ABPYkV7qKq0/0.jpg)](https://www.youtube.com/watch?v=ABPYkV7qKq0)
 
 
 # Installation
