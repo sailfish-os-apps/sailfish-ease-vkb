@@ -3,6 +3,10 @@
 ![Preview](http://i.imgur.com/mekiJ4X.png "Sailfish Ease keyboard Preview")
 ![Preview](http://i.imgur.com/LheLfqC.png "Sailfish Ease keyboard Preview")
 
+# Sailfish Loopen virtual Keyboard
+
+![Preview](https://youtu.be/ABPYkV7qKq0 "Sailfish Loopen keyboard Preview")
+
 
 # Installation
 
