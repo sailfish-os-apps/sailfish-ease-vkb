@@ -4,6 +4,7 @@
 import QtQuick 2.0
 import com.meego.maliitquick 1.0
 import Sailfish.Silica 1.0
+import com.jolla.keyboard 1.0
 
 Item {
     id: layoutLoopen
@@ -182,8 +183,7 @@ Item {
             moveSerie = []
             var touchpoint = touchPoints[0]
             var pos = getPos(touchpoint.x, touchpoint.y)
-            moveSerie.push(pos)
-            fullMoveSerie.push(pos)
+            pushMove(pos)
             evaluateSelection()
             paint.pathData = "M%1,%2".arg (touchpoint.x).arg (touchpoint.y);
             paint.canErase = false
@@ -212,9 +212,7 @@ Item {
                     if (pos === -1) {
                         processInput()
                     }
-                    moveSerie.push(pos)
-                    languageSwitchTimer.stop()
-                    fullMoveSerie.push(pos)
+                    pushMove(pos)
                 }
             }
             evaluateSelection()
@@ -236,6 +234,14 @@ Item {
             paint.canErase = true
             languageSwitchTimer.stop()
         }
+    }
+
+    function pushMove(pos) {
+        languageSwitchTimer.stop()
+        moveSerie.push(pos)
+        fullMoveSerie.push(pos)
+        SampleCache.play("/usr/share/sounds/jolla-ambient/stereo/keyboard_letter.wav")
+        buttonPressEffect.play()
     }
 
     function processInput() {
