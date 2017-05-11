@@ -50,7 +50,7 @@ Item {
     property bool numActive: false
     property bool specialActive: false
 
-    property var centerLetterMove: specialActive ? specialCaption : (numActive? numCaption : letterCaptions)
+    property var centerLetterMove: attributes.inSymView ? (attributes.inSymView2 ? specialCaption : numCaption) : letterCaptions
 
     property var letterCaptions: ({})
     property var numCaption:({})
@@ -281,7 +281,6 @@ Item {
             MInputMethodQuick.sendCommit(text)
             lastAccentMerge = ""
         }
-        specialActive = false
     }
 
     function backSpace() {
@@ -381,117 +380,111 @@ Item {
         }
     }
 
-    FunctionKey {
-        id:backspaceKey
-        icon.source: "image://theme/icon-m-backspace" + (pressed ? ("?" + Theme.highlightColor) : "")
-        repeat: true
-        key: Qt.Key_Backspace
-        height: width * 0.6
-        implicitWidth: shiftKeyWidth
-        background.visible: false
+    Column {
         anchors.centerIn: parent
-        anchors.verticalCenterOffset:  - parent.height / 2 + height * 0.5
+        height: parent.height
+        width: functionKeyWidth * 1.1
         anchors.horizontalCenterOffset:  parent.height / 2
 
-        property bool pressed: false
+        property int nbrItem: 4
 
-        MultiPointTouchArea {
-            anchors.fill: backspaceKey
-            maximumTouchPoints: 1
-            onPressed: {
-                backspaceKey.pressed = true
-                backSpace()
-                autorepeatTimer.start()
-            }
-
-            onReleased: {
-                backspaceKey.pressed = false
-                moveSerie = []
-            }
-        }
-
-        Timer {
-            id: autorepeatTimer
+        FunctionKey {
+            id:backspaceKey
+            icon.source: "image://theme/icon-m-backspace" + (pressed ? ("?" + Theme.highlightColor) : "")
             repeat: true
-            interval: 80
+            key: Qt.Key_Backspace
+            height: parent.height / parent.nbrItem
+            implicitWidth: parent.width
+            background.visible: false
+            anchors.horizontalCenter: parent.horizontalCenter
 
-            onTriggered: {
-                if (backspaceKey.pressed) {
+            property bool pressed: false
+
+            MultiPointTouchArea {
+                anchors.fill: backspaceKey
+                maximumTouchPoints: 1
+                onPressed: {
+                    backspaceKey.pressed = true
                     backSpace()
-                } else {
-                    stop()
+                    autorepeatTimer.start()
+                }
+
+                onReleased: {
+                    backspaceKey.pressed = false
                     moveSerie = []
                 }
             }
-        }
-    }
 
-    FunctionKey {
-        id:specialKey
-        repeat: true
-        key: Qt.Key_Backspace
-        height: width * 0.6
-        implicitWidth: shiftKeyWidth
-        background.visible: true
-        anchors.centerIn: parent
-        anchors.verticalCenterOffset:  - parent.height / 2 + height * 2.5
-        anchors.horizontalCenterOffset:  parent.height / 2
+            Timer {
+                id: autorepeatTimer
+                repeat: true
+                interval: 80
 
-        property bool pressed: false
-
-        MultiPointTouchArea {
-            anchors.fill: specialKey
-            maximumTouchPoints: 1
-
-            onReleased: {
-
+                onTriggered: {
+                    if (backspaceKey.pressed) {
+                        backSpace()
+                    } else {
+                        stop()
+                        moveSerie = []
+                    }
+                }
             }
         }
-    }
 
-    FunctionKey { // copied  EnterKey: i don't know why but it doesn't like as an element
-        id: enterKey
-        active: mylay.isLandscape
-        icon.source: MInputMethodQuick.actionKeyOverride.icon
-        caption:  MInputMethodQuick.actionKeyOverride.label
-        key: Qt.Key_Return
-        enabled: MInputMethodQuick.actionKeyOverride.enabled
-        background.opacity: pressed ? 0.6 : MInputMethodQuick.actionKeyOverride.highlighted ? 0.4 : 0.17
-        height: width * 0.7
-        implicitWidth: shiftKeyWidth * 1.5
-        background.visible: true
-        anchors.centerIn: parent
-        anchors.verticalCenterOffset:    parent.height / 2 - height * 0.6
-        anchors.horizontalCenterOffset:  parent.height / 2
+        SymbolKey {
+            id: symbolKey
+            height: parent.height / parent.nbrItem
+            implicitWidth: parent.width
+            anchors.horizontalCenter: parent.horizontalCenter
 
-        MultiPointTouchArea {
-            anchors.fill: enterKey
-            maximumTouchPoints: 1
-            onPressed: {
-                enterKey.pressed = true
-                commitText("\n")
-            }
-
-            onReleased: {
-                enterKey.pressed = false
-                moveSerie = []
+            MultiPointTouchArea {
+                anchors.fill: symbolKey
+                maximumTouchPoints: 1
+                onPressed: {
+                    symbolKey.clicked()
+                }
             }
         }
-    }
 
-    ShiftEaseKey {
-        id: shiftKey
-        height: width * 0.7
-        implicitWidth: shiftKeyWidth * 1.5
-        anchors.centerIn: parent
-        anchors.verticalCenterOffset:    parent.height / 2 - height * 1.5
-        anchors.horizontalCenterOffset:  parent.height / 2
+        ShiftKey {
+            id: shiftKey
+            height: parent.height / parent.nbrItem
+            implicitWidth: shiftKeyWidth * 1.5
+            anchors.horizontalCenter: parent.horizontalCenter
 
-        MultiPointTouchArea {
-            anchors.fill: shiftKey
-            maximumTouchPoints: 1
-            onPressed: {
-                shiftKey.clicked()
+            MultiPointTouchArea {
+                anchors.fill: shiftKey
+                maximumTouchPoints: 1
+                onPressed: {
+                    shiftKey.clicked()
+                }
+            }
+        }
+
+        FunctionKey { // copied  EnterKey: i don't know why but it doesn't like as an element
+            id: enterKey
+            icon.source: MInputMethodQuick.actionKeyOverride.icon
+            caption:  MInputMethodQuick.actionKeyOverride.label
+            key: Qt.Key_Return
+            enabled: MInputMethodQuick.actionKeyOverride.enabled
+            background.opacity: pressed ? 0.6 : MInputMethodQuick.actionKeyOverride.highlighted ? 0.4 : 0.17
+            height: parent.height / parent.nbrItem
+            implicitWidth: parent.width
+            background.visible: true
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            MultiPointTouchArea {
+                anchors.fill: enterKey
+                maximumTouchPoints: 1
+                onPressed: {
+                    enterKey.pressed = true
+                    commitText("\n")
+                }
+
+                onReleased: {
+                    enterKey.pressed = false
+                    moveSerie = []
+                }
             }
         }
     }
