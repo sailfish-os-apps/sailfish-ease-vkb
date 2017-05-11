@@ -82,6 +82,7 @@ KeyBase {
     Text {
         id: textItem
         anchors.fill: parent
+        anchors.margins: Math.min(parent.width, parent.height) * 0.1
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font.family: Theme.fontFamily
@@ -93,6 +94,8 @@ KeyBase {
     Repeater {
         model: swipeArray
         delegate: Text {
+            width: Math.min(parent.width, parent.height) * 0.5
+            height: width
             anchors.centerIn: textItem
             anchors.verticalCenterOffset: index < 3 ? -aCharKey.height * 0.4
                                                     : index > 4 ? aCharKey.height * 0.4
@@ -104,6 +107,7 @@ KeyBase {
             verticalAlignment: Text.AlignVCenter
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeSmall
+            fontSizeMode: Text.Fit
             color: Theme.primaryColor
             text: modelData === "" ? swipeSpecial[index] : !attributes.inSymView ? modelData : ""
             opacity: modelData !== "" ? 0.8 : attributes.inSymView2 || attributes.inSymView  ? 0.5 : 0
