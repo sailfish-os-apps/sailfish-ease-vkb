@@ -56,7 +56,7 @@ Item {
     property var numCaption:({})
     property var specialCaption:({})
     property string selection: ""
-    property bool capitalSelected: false
+    property bool capitalMove: false
     property int selectionNumber: -1
 
     Component.onCompleted: updateSizes()
@@ -80,8 +80,8 @@ Item {
     Text {
         id: textField
         anchors.centerIn: centerDot
-        width: centerDot.width - 2*x
-        height: centerDot.height
+        width: centerDot.width / 2
+        height: centerDot.height / 2
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         text: languageCode
@@ -163,7 +163,7 @@ Item {
                         id: charText
                         anchors.verticalCenter: parent.top
                         anchors.horizontalCenter: parent.left
-                        text: capitalSelected && lowercase.indexOf(modelData) !== -1 ? uppercase.charAt(lowercase.indexOf(modelData)) : modelData
+                        text: attributes.isShifted !== capitalMove && lowercase.indexOf(modelData) !== -1 ? uppercase.charAt(lowercase.indexOf(modelData)) : modelData
                         font.family: Theme.fontFamily
                         font.bold: branch.selected && selectionNumber === index ? true : false
                         font.pixelSize: Theme.fontSizeMedium
@@ -245,26 +245,22 @@ Item {
     }
 
     function processInput() {
-        var letter = "_"
-        var idxOff = (moveSerie[0] === -1 ? 0 : -1)
+        var letter = ""
+        var startIdx = (capitalMove ? 0 : 1)
         if ((moveSerie.length >= 3 && moveSerie[0] === -1) || (moveSerie.length >= 2 && moveSerie[0] !== -1)) {
-            var direction = moveSerie[2 + idxOff] === (moveSerie[1 + idxOff] + 1) % branchAngles.length ? "left" : "right"
-            var branchAngle = branchAngles[(direction === "left" ? (moveSerie[1 + idxOff] + 1) : moveSerie[1 + idxOff]) % branchAngles.length]
+            var direction = moveSerie[startIdx + 1] === (moveSerie[startIdx] + 1) % branchAngles.length ? "left" : "right"
+            var branchAngle = branchAngles[(direction === "left" ? (moveSerie[startIdx] + 1) : moveSerie[startIdx]) % branchAngles.length]
             var branchKey = branchAngle + "-" + direction
             var branch = centerLetterMove[branchKey]
-            letter = branch[(moveSerie.length - 3 - idxOff) % 4]
+            letter = branch[(moveSerie.length - (2 + startIdx)) % 4]
         }
-        if (moveSerie[0] === -1) {
-            if (moveSerie.length >= 3 && moveSerie.length < 7) {
-                commitText(letter)
-            } else {
-                commitText(" ")
-            }
-        } else if (moveSerie.length >= 2 && moveSerie.length < 6) {
-            if (lowercase.indexOf(letter) !== -1) {
+        if (moveSerie.length >= startIdx + 2 && moveSerie.length < startIdx + 6) {
+            if (lowercase.indexOf(letter) !== -1 && attributes.isShifted !== capitalMove) {
                 letter = uppercase.charAt(lowercase.indexOf(letter))
             }
             commitText(letter)
+        } else if (moveSerie.length === 1 && moveSerie[0] === -1) {
+            commitText(" ")
         }
         moveSerie = []
     }
@@ -332,9 +328,9 @@ Item {
             selectionNumber = -1
         }
         if (moveSerie.length < 1 || moveSerie[0] === -1) {
-            capitalSelected = false
+            capitalMove = false
         } else {
-            capitalSelected = true
+            capitalMove = true
         }
     }
 
@@ -453,11 +449,51 @@ Item {
         }
     }
 
-    SpacebarKey {
-        height: backspaceKey.height
-        implicitWidth: shiftKeyWidth
+    FunctionKey { // copied  EnterKey: i don't know why but it doesn't like as an element
+        id: enterKey
+        active: mylay.isLandscape
+        icon.source: MInputMethodQuick.actionKeyOverride.icon
+        caption:  MInputMethodQuick.actionKeyOverride.label
+        key: Qt.Key_Return
+        enabled: MInputMethodQuick.actionKeyOverride.enabled
+        background.opacity: pressed ? 0.6 : MInputMethodQuick.actionKeyOverride.highlighted ? 0.4 : 0.17
+        height: width * 0.7
+        implicitWidth: shiftKeyWidth * 1.5
+        background.visible: true
         anchors.centerIn: parent
-        anchors.verticalCenterOffset:  parent.height / 2 + height
+        anchors.verticalCenterOffset:    parent.height / 2 - height * 0.6
+        anchors.horizontalCenterOffset:  parent.height / 2
+
+        MultiPointTouchArea {
+            anchors.fill: enterKey
+            maximumTouchPoints: 1
+            onPressed: {
+                enterKey.pressed = true
+                commitText("\n")
+            }
+
+            onReleased: {
+                enterKey.pressed = false
+                moveSerie = []
+            }
+        }
+    }
+
+    ShiftEaseKey {
+        id: shiftKey
+        height: width * 0.7
+        implicitWidth: shiftKeyWidth * 1.5
+        anchors.centerIn: parent
+        anchors.verticalCenterOffset:    parent.height / 2 - height * 1.5
+        anchors.horizontalCenterOffset:  parent.height / 2
+
+        MultiPointTouchArea {
+            anchors.fill: shiftKey
+            maximumTouchPoints: 1
+            onPressed: {
+                shiftKey.clicked()
+            }
+        }
     }
 
     Paint {
