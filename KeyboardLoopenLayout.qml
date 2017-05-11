@@ -30,14 +30,23 @@ Item {
     property bool capsLockSupported: true
 
     property bool is8Pen: true
-    property var accentMap: {
-        "´": {"e": "é", "E": "É", "a": "á", "A": "Á", "o": "ó", "O": "Ó", "i": "í", "I": "Í", "u": "ú", "U": "Ú", "y": "ý", "Y": "Ý"                   },
-        "^": {"e": "ê", "E": "Ê", "a": "â", "A": "Â", "o": "ô", "O": "Ô", "i": "î", "I": "Î", "u": "û", "U": "Û"                                       },
-        "¨": {"e": "ë", "E": "Ë", "a": "ä", "A": "Ä", "o": "ö", "O": "Ö", "i": "ï", "I": "Ï", "u": "ü", "U": "Ü", "y": "ÿ", "Y": "Ϋ"                   },
-        "`": {"e": "è", "E": "È", "a": "à", "A": "À", "o": "ò", "O": "Ò", "i": "ì", "I": "Ì", "u": "ù", "U": "Ù"                                       },
-        "°": {                    "a": "å", "A": "Å"                                                                                                   },
-        "~": {                    "a": "ã", "A": "Ã", "o": "õ", "O": "Õ"                                                           , "n": "ñ", "N": "Ñ"},
-        "¸": {"c": "ç", "C": "Ç"}
+    property var subMenu: {
+                "e": ["é", "ê", "ë", "è"],
+                "E": ["É", "Ê", "Ë", "È"],
+                "a": ["á", "â", "ä", "à", "å", "ã"],
+                "A": ["Á", "Â", "Ä", "À", "Å", "Ã"],
+                "o": ["ó", "ô", "ö", "ò", "õ"],
+                "O": ["Ó", "Ô", "Ö", "Ò", "Õ"],
+                "i": ["í", "î", "ï", "ì"],
+                "I": ["Í", "Î", "Ï", "Ì"],
+                "u": ["ú", "û", "ü", "ù", ],
+                "U": ["Ú", "Û", "Ü", "Ù"],
+                "y": ["ý", "ÿ"],
+                "Y": ["Ý", "Ϋ"],
+                "n": ["ñ"],
+                "N": ["Ñ"],
+                "c": ["ç"],
+                "C": ["Ç"]
     }
     property string lastAccentMerge: ""
 
@@ -49,12 +58,14 @@ Item {
 
     property bool numActive: false
     property bool specialActive: false
+    property bool subMenuActive: false
 
-    property var centerLetterMove: attributes.inSymView ? (attributes.inSymView2 ? specialCaption : numCaption) : letterCaptions
+    property var centerLetterMove: subMenuActive ? subMenuCaption : attributes.inSymView ? (attributes.inSymView2 ? specialCaption : numCaption) : letterCaptions
 
     property var letterCaptions: ({})
     property var numCaption:({})
     property var specialCaption:({})
+    property var subMenuCaption:({})
     property string selection: ""
     property bool capitalMove: false
     property int selectionNumber: -1
@@ -104,6 +115,24 @@ Item {
             point.pressedKey = centerDot
             point.initialKey = null
             keyboard.languageSelectionItem.show(point)
+        }
+    }
+
+    Timer {
+        id: subMenuTimer
+        interval: 1000
+        onTriggered: {
+            var previousChar = MInputMethodQuick.surroundingText.charAt(MInputMethodQuick.surroundingText.length - 1)
+            subMenuCaption = {}
+            var list = [previousChar].concat(subMenu[previousChar])
+            var keys = Object.keys(centerLetterMove)
+            for (var i = 0; i < keys.length; i++) {
+                subMenuCaption[keys[i]] = []
+                for (var j = 0; j < list.length; j+= keys.length) {
+                    subMenuCaption[keys[i]].push(list[i + j])
+                }
+            }
+            subMenuActive = true
         }
     }
 
@@ -206,11 +235,16 @@ Item {
             }
             var pos = getPos(touchpoint.x, touchpoint.y)
             if (pos !== moveSerie[moveSerie.length - 1]) {
+                subMenuTimer.stop()
                 if (moveSerie.length > 1 && pos === moveSerie[moveSerie.length - 2]) {
                     moveSerie.splice(-1,1)
                 } else {
                     if (pos === -1) {
                         processInput()
+                        var previousChar = MInputMethodQuick.surroundingText.charAt(MInputMethodQuick.surroundingText.length - 1)
+                        if (Object.keys(subMenu).indexOf(previousChar) !== -1) {
+                            subMenuTimer.start()
+                        }
                     }
                     pushMove(pos)
                 }
@@ -233,6 +267,7 @@ Item {
             paint.pathData = ""
             paint.canErase = true
             languageSwitchTimer.stop()
+            subMenuTimer.stop()
         }
     }
 
@@ -258,15 +293,21 @@ Item {
             if (lowercase.indexOf(letter) !== -1 && attributes.isShifted !== capitalMove) {
                 letter = uppercase.charAt(lowercase.indexOf(letter))
             }
+            if (subMenuActive){
+                MInputMethodQuick.sendKey(Qt.Key_Backspace, 0, "\b", Maliit.KeyClick)
+            }
             commitText(letter)
         } else if (moveSerie.length === 1 && moveSerie[0] === -1) {
             commitText(" ")
         }
         moveSerie = []
+        subMenuActive = false
     }
 
     function commitText(text) {
-        if (text in accentMap) {
+        MInputMethodQuick.sendCommit(text)
+        lastAccentMerge = ""
+        /*if (text in accentMap) {
             var previousChar = MInputMethodQuick.surroundingText.charAt(MInputMethodQuick.surroundingText.length - 1)
             if (previousChar in accentMap[text]) {
                 var merge = accentMap[text][previousChar]
@@ -280,7 +321,7 @@ Item {
         } else {
             MInputMethodQuick.sendCommit(text)
             lastAccentMerge = ""
-        }
+        }*/
     }
 
     function backSpace() {
