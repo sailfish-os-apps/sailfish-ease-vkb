@@ -31,12 +31,21 @@ Item {
 
     property bool is8Pen: true
     property var subMenu: {
+                "⌂": ["´", "^", "é", "ê", "á", "â", "ó", "ô", "í", "î", "ú", "û",
+                      "¨", "`", "ë", "è", "ä", "à", "ö", "ò", "ï", "ì", "ü", "ù",
+                      "°", "¸", "ñ", "ç", "å", "ã", "õ", "" , "ý", "ÿ"],
+                "☺": ["☺", "☻", "♥", "♦", "♣", "♠", "•", "◘", "♂", "♀", "♪", "♫",
+                      "☼", "►", "◄", "▲", "▼", "↕", "▬", "↨", "↑", "↓", "→", "←",
+                      "∟", "↔", "○", "◙", "", "", "", "", "", "", "", ""],
+                "╬": ["│", "┤", "╣", "║", "╗", "╝", "┐", "└", "═", "┴", "┬", "├",
+                     "─", "┼", "╚", "╔", "╩", "╦", "╠", "╬", "┘", "┌", "█", "▄",
+                     "¦", "▀", "░", "▒", "▓", "", "", "", "", "", "", ""],
                 "´": ["é", "É", "á", "Á", "ó", "Ó", "í", "Í", "ú", "Ú", "ý", "Ý"],
                 "^": ["ê", "Ê", "â", "Â", "ô", "Ô", "î", "Î", "û", "Û"],
                 "¨": ["ë", "Ë", "ä", "Ä", "ö", "Ö", "ï", "Ï", "ü", "Ü", "ÿ", "Ϋ"],
                 "`": ["è", "È", "à", "À", "ò", "Ò", "ì", "Ì", "ù", "Ù"],
-                "°": ["å", "Å"],
-                "~": ["ã", "Ã", "õ", "Õ", "ñ", "Ñ"],
+                "°": [          "å", "Å"],
+                "~": [          "ã", "Ã", "õ", "Õ", "ñ", "Ñ"],
                 "¸": ["ç", "Ç"]
     }
     property var accentMap: {
@@ -62,8 +71,8 @@ Item {
     property var moveSerie: []
     property var fullMoveSerie: []
 
-    property string lowercase: "abcdefghijklmnopqrstuvwxyz"
-    property string uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    property string lowercase: "abcdefghijklmnopqrstuvwxyzéêëèáâäàåãóôöòõúûüùíîïìýÿçñæø"
+    property string uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZÉÊËÈÁÂÄÀÅÃÓÔÖÒÕÚÛÜÙÍÎÏÌÝΫÇÑÆØ"
 
     property bool numActive: false
     property bool specialActive: false
@@ -133,7 +142,7 @@ Item {
         onTriggered: {
             var previousChar = MInputMethodQuick.surroundingText.charAt(MInputMethodQuick.surroundingText.length - 1)
             subMenuCaption = {}
-            var list = [previousChar].concat(subMenu[previousChar])
+            var list = subMenu[previousChar]
             var keys = Object.keys(centerLetterMove)
             for (var i = 0; i < keys.length; i++) {
                 subMenuCaption[keys[i]] = []
@@ -142,6 +151,7 @@ Item {
                 }
             }
             subMenuActive = true
+            MInputMethodQuick.sendKey(Qt.Key_Backspace, 0, "\b", Maliit.KeyClick)
         }
     }
 
@@ -201,7 +211,7 @@ Item {
                         id: charText
                         anchors.verticalCenter: parent.top
                         anchors.horizontalCenter: parent.left
-                        text: attributes.isShifted !== capitalMove && lowercase.indexOf(modelData) !== -1 ? uppercase.charAt(lowercase.indexOf(modelData)) : modelData
+                        text: attributes.isShifted !== capitalMove && modelData !== "" && lowercase.indexOf(modelData) !== -1 ? uppercase.charAt(lowercase.indexOf(modelData)) : modelData
                         font.family: Theme.fontFamily
                         font.bold: branch.selected && selectionNumber === index ? true : false
                         font.pixelSize: Theme.fontSizeMedium
@@ -250,6 +260,7 @@ Item {
                 } else {
                     if (pos === -1) {
                         processInput()
+                        subMenuActive = false
                         var previousChar = MInputMethodQuick.surroundingText.charAt(MInputMethodQuick.surroundingText.length - 1)
                         if (Object.keys(subMenu).indexOf(previousChar) !== -1) {
                             subMenuTimer.start()
@@ -302,15 +313,12 @@ Item {
             if (lowercase.indexOf(letter) !== -1 && attributes.isShifted !== capitalMove) {
                 letter = uppercase.charAt(lowercase.indexOf(letter))
             }
-            if (subMenuActive){
-                MInputMethodQuick.sendKey(Qt.Key_Backspace, 0, "\b", Maliit.KeyClick)
-            }
             commitText(letter)
         } else if (moveSerie.length === 1 && moveSerie[0] === -1) {
             commitText(" ")
+            subMenuActive = false
         }
         moveSerie = []
-        subMenuActive = false
     }
 
     function commitText(text) {
