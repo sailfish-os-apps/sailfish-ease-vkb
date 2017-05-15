@@ -43,7 +43,7 @@ KeyboardLoopenLayout {
                 "180-left":  ["s", "k", "q"],
                 "180-right": ["t", "a", "x"],
                 "240-left":  ["n", "l", "£"],
-                "240-right": ["m", "y", "\""],
+                "240-right": ["m", "y", "´"],
                 "300-left":  ["r", "b", "'"],
                 "300-right": ["d", "w", "&"]
             }
