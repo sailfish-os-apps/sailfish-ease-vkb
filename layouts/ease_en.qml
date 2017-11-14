@@ -35,7 +35,7 @@ EaseBase {
 
     easeLayout: {
         "topLeft": {
-            "caption":        "a", "swipeCaption":        ["", "", "", "", "", "", "", "v"], "swipeSpecial": ["", "", "", "", "-", "", "", ""],
+            "caption":        "a", "swipeCaption":        ["", "", "", "", "", "", "", "v"], "swipeSpecial": ["", "", "", "", "-", "$", "", ""],
             "captionShifted": "A", "swipeCaptionShifted": ["", "", "", "", "", "", "", "V"], "symView": "1" },
         "top": {
             "caption":        "n", "swipeCaption":        ["", "", "", "", "", "", "l", ""], "swipeSpecial": ["`", "^", "´", "+", "!", "/", "", "\\"],
