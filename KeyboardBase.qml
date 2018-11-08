@@ -34,7 +34,7 @@ import com.jolla.keyboard 1.0
 import org.nemomobile.configuration 1.0
 import "touchpointarray.js" as ActivePoints
 
-Item {
+SwipeGestureArea {
     id: keyboard
 
     property Item layout
@@ -55,12 +55,14 @@ Item {
                                                                                    :(typeof inputHandler.preedit !== "string"
                                                                                      || inputHandler.preedit.length === 0)))
     readonly property bool isShiftLocked: shiftState === ShiftState.LockedShift
+    readonly property alias languageSelectionPopupVisible: languageSelectionPopup.visible
 
     property bool inSymView
     property bool inSymView2
     // allow chinese input handler to override enter key state
     property bool chineseOverrideForEnter
 
+    property bool silenceFeedback
     property bool layoutChangeAllowed
     property string deadKeyAccent
     property bool shiftKeyPressed
@@ -69,12 +71,21 @@ Item {
     property bool closeSwipeActive
     property int closeSwipeThreshold: Math.max(height*.3, Theme.itemSizeSmall)
 
-    property QtObject emptyAttributes: Item {
+    property QtObject nextLayoutAttributes: QtObject {
         property bool isShifted
         property bool inSymView
         property bool inSymView2
         property bool isShiftLocked
         property bool chineseOverrideForEnter
+
+        function update(layout) {
+            // Figure out what state we want to animate the next layout in
+            isShifted = keyboard.shouldUseAutocaps(layout)
+            inSymView = false
+            inSymView2 = false
+            isShiftLocked = false
+            chineseOverrideForEnter = keyboard.chineseOverrideForEnter
+        }
     }
 
     // Can be changed to PreeditTestHandler to have another mode of input
@@ -83,6 +94,7 @@ Item {
 
     property Item inputEaseHandler: InputEaseHandler {
     }
+    readonly property bool swipeGestureIsSafe: !releaseTimer.running
 
     height: layout ? layout.height : 0
     onLayoutChanged: if (layout) layout.parent = keyboard
@@ -97,9 +109,13 @@ Item {
         z: 10
         target: lastPressedKey
         visible: (typeof layout.isEase === 'undefined')
+        onExpandedChanged: {
+            if (expanded) {
+                keyboard.cancelGesture()
+            }
+        }
     }
 
-    property var languageSelectionItem: languageSelectionPopup
     LanguageSelectionPopup {
         id: languageSelectionPopup
         z: 11
@@ -108,6 +124,11 @@ Item {
     Timer {
         id: pressTimer
         interval: 500
+    }
+
+    Timer {
+        id: releaseTimer
+        interval: 300
     }
 
     Timer {
@@ -195,9 +216,8 @@ Item {
             return
         }
 
-        //if (typeof layout.isEase !== 'undefined') {
-
         closeSwipeActive = true
+        silenceFeedback = false
         pressTimer.start()
 
         for (var i = 0; i < touchPoints.length; i++) {
@@ -221,26 +241,29 @@ Item {
             point.x = incomingPoint.x
             point.y = incomingPoint.y
 
-            if (ActivePoints.array.length === 1
-                    && closeSwipeActive
-                    && pressTimer.running
-                    && (point.y - point.startY > closeSwipeThreshold)
-                    && (typeof layout.isEase === 'undefined')) {
-                // swiped down to close keyboard
-                MInputMethodQuick.userHide()
-                if (point.pressedKey) {
-                    if (typeof layout.isEase !== 'undefined') {
-                        inputEaseHandler._handleKeyRelease()
-                    } else {
-                        inputHandler._handleKeyRelease()
+            if (ActivePoints.array.length === 1 && closeSwipeActive && pressTimer.running && (typeof layout.isEase === 'undefined')) {
+                var yDiff = point.y - point.startY
+                silenceFeedback = (yDiff > Math.abs(point.x - point.startX))
+
+                if (yDiff > closeSwipeThreshold) {
+                    // swiped down to close keyboard
+                    MInputMethodQuick.userHide()
+                    if (point.pressedKey) {
+                        if (typeof layout.isEase !== 'undefined') {
+                            inputEaseHandler._handleKeyRelease()
+                        } else {
+                            inputHandler._handleKeyRelease()
+                        }
+                        point.pressedKey.pressed = false
                     }
-                    point.pressedKey.pressed = false
+                    lastPressedKey = null
+                    pressTimer.stop()
+                    languageSwitchTimer.stop()
+                    ActivePoints.remove(point)
+                    return
                 }
-                lastPressedKey = null
-                pressTimer.stop()
-                languageSwitchTimer.stop()
-                ActivePoints.remove(point)
-                return
+            } else {
+                silenceFeedback = false
             }
 
             if (popper.expanded && point.pressedKey === lastPressedKey) {
@@ -306,9 +329,9 @@ Item {
         if (point.pressedKey === key)
             return
 
-        buttonPressEffect.play()
+        if (!silenceFeedback) buttonPressEffect.play()
 
-        if (key) {
+        if (key && !silenceFeedback) {
             if (typeof key.keyType !== 'undefined' && key.keyType === KeyType.CharacterKey && key.text !== " ") {
                 SampleCache.play("/usr/share/sounds/jolla-ambient/stereo/keyboard_letter.wav")
             } else {
@@ -350,6 +373,8 @@ Item {
     }
 
     function handleReleased(touchPoints) {
+        releaseTimer.restart()
+
         if (languageSelectionPopup.visible) {
             if (languageSelectionPopup.opening) {
                 languageSelectionPopup.hide()
@@ -479,23 +504,20 @@ Item {
         inSymView2 = false
 
         resetShift()
-        if (typeof layout.isEase !== 'undefined') {
-            inputEaseHandler._reset()
-        } else {
-            inputHandler._reset()
-        }
+        inputHandler._reset()
 
         lastPressedKey = null
         lastInitialKey = null
         deadKeyAccent = ""
     }
 
-    function applyAutocaps() {
+    function shouldUseAutocaps(layout) {
         if (MInputMethodQuick.surroundingTextValid
                 && MInputMethodQuick.contentType === Maliit.FreeTextContentType
                 && MInputMethodQuick.autoCapitalizationEnabled
                 && !MInputMethodQuick.hiddenText
                 && layout && layout.type === "") {
+
             var position = MInputMethodQuick.cursorPosition
             var text = MInputMethodQuick.surroundingText.substring(0, position)
 
@@ -503,13 +525,17 @@ Item {
                     || (position == 1 && text[0] === " ")
                     || (position >= 2 && text[position - 1] === " "
                         && ".?!".indexOf(text[position - 2]) >= 0)) {
-                autocaps = true
+                return true
             } else {
-                autocaps = false
+                return false
             }
         } else {
-            autocaps = false
+            return false
         }
+    }
+
+    function applyAutocaps() {
+        autocaps = shouldUseAutocaps(layout)
     }
 
     function cycleShift() {
